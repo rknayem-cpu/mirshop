@@ -468,7 +468,7 @@ router.get('/admin-login', (req, res) => {
 
 router.post('/admin-login', (req, res) => {
     const { secretPassword } = req.body;
-    const MY_PASSWORD = "mirshop123"; // 👈 আপনার মনের মতো পাসওয়ার্ড এখানে দিন
+    const MY_PASSWORD = process.env.MY_PASSWORD; // 👈 আপনার মনের মতো পাসওয়ার্ড এখানে দিন
 
     if (secretPassword === MY_PASSWORD) {
         req.session.admin = true; // ✅ সেশন সেট হয়ে গেল!
