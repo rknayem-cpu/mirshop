@@ -1,0 +1,220 @@
+<%- include('partials/header') %>
+
+<div class="w-full bg-[#f8fafc] py-12 px-4 min-h-screen flex flex-col items-center">
+  <div class="w-full max-w-2xl">
+    
+    <!-- 📄 Header Section -->
+    <div class="text-center mb-8">
+      <h1 class="text-2xl font-black text-slate-950 tracking-wider uppercase inline-flex items-center gap-2">
+        <span class="w-2 h-5 bg-orange-600 block"></span> Track Your Cargo
+      </h1>
+      <p class="text-xs font-mono text-slate-400 uppercase tracking-widest mt-1">Enter your 6-digit order loop ID below</p>
+    </div>
+
+    <!-- 🔍 Search Box Container -->
+    <div class="bg-white border-2 border-slate-950 p-6 shadow-[4px_4px_0px_rgba(15,23,42,1)] mb-8">
+      <form action="/track" method="POST" class="flex flex-col sm:flex-row gap-3">
+        <div class="relative flex-1 border-2 border-slate-950 bg-white group">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400 group-focus-within:text-orange-600">
+            <i class="fa-solid fa-satellite-dish text-xs"></i>
+          </span>
+          <input 
+            type="text" 
+            name="orderId"
+            value="<%= searchedId %>"
+            maxlength="6"
+            placeholder="ENTER 6-DIGIT ORDER ID (E.G. 583920)..." 
+            required
+            class="w-full pl-9 pr-4 py-3 bg-transparent font-mono text-xs text-slate-950 focus:outline-none placeholder:text-slate-300 placeholder:font-mono uppercase tracking-wider"
+          />
+        </div>
+        <button 
+          type="submit" 
+          class="bg-orange-600 hover:bg-orange-700 text-white font-mono text-xs font-black px-6 py-3 uppercase tracking-widest transition-all border-2 border-slate-950 shadow-[2px_2px_0px_rgba(15,23,42,1)] active:translate-y-0.5 active:shadow-none"
+        >
+          Trace Order
+        </button>
+      </form>
+
+      <!-- ⚠️ Error Message Notification -->
+      <% if (error) { %>
+        <div class="mt-4 p-3 bg-red-50 border border-red-200 flex items-center gap-2 text-red-600 font-mono text-[11px] uppercase tracking-wide">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span><%= error %></span>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- 📦 Tracking Results Area -->
+    <% if (order) { %>
+      <div class="bg-white border-2 border-slate-950 shadow-[4px_4px_0px_rgba(15,23,42,1)] transition-all">
+        
+        <!-- Top Metadata Ribbon -->
+        <div class="bg-slate-950 text-white p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b-2 border-slate-950">
+          <div>
+            <span class="text-[9px] font-mono text-slate-400 block uppercase tracking-widest">// TARGET NODE</span>
+            <h2 class="text-sm font-black font-mono text-orange-400">ORDER ID: #<%= order.orderId %></h2>
+          </div>
+          <div class="text-right sm:text-right">
+            <span class="text-[9px] font-mono text-slate-400 block uppercase tracking-widest">CURRENT STATUS</span>
+            <span class="text-xs font-black font-mono uppercase tracking-wide px-2 py-0.5 bg-white text-slate-950">
+              <%= order.status %>
+            </span>
+          </div>
+        </div>
+
+        <!-- 🚀 Visual Pipeline Steps with Live Time Logs -->
+        <div class="p-6 border-b-2 border-dashed border-slate-100 bg-slate-50/50">
+          <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-6 md:gap-2">
+            
+            <!-- Background Progress Bar (Hidden on mobile) -->
+            <div class="hidden md:block absolute top-[14px] left-4 right-4 h-1 bg-slate-200 -z-0"></div>
+
+            <% 
+              const statuses = ['Pending', 'Processing', 'Shipped', 'Delivered'];
+              const currentStepIndex = statuses.indexOf(order.status);
+
+              // ডেটাবেজের statusHistory থেকে টাইম ও ডেট পার্স করার হেল্পার ফাংশন
+              function getLogTime(statusName) {
+                if (!order.statusHistory || order.statusHistory.length === 0) return null;
+                const log = order.statusHistory.find(h => h.status === statusName);
+                if (!log) return null;
+                
+                const dateObj = new Date(log.changedAt);
+                const dateStr = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                
+                return { dateStr, timeStr };
+              }
+
+              const pendingTime = getLogTime('Pending');
+              const processingTime = getLogTime('Processing');
+              const shippedTime = getLogTime('Shipped');
+              const deliveredTime = getLogTime('Delivered');
+            %>
+
+            <!-- Step 1: Pending -->
+            <div class="flex md:flex-col items-center md:items-center text-left md:text-center gap-3 md:gap-2 z-10 w-full md:w-auto">
+              <div class="w-8 h-8 rounded-full border-2 border-slate-950 flex items-center justify-center font-mono text-xs font-black shadow-[1px_1px_0px_rgba(0,0,0,1)]
+                <%= currentStepIndex >= 0 ? 'bg-amber-400 text-slate-950' : 'bg-white text-slate-300 border-slate-200 shadow-none' %>">
+                <i class="fa-solid fa-receipt"></i>
+              </div>
+              <div>
+                <p class="text-[10px] font-black uppercase tracking-wider <%= currentStepIndex >= 0 ? 'text-slate-950' : 'text-slate-300' %>">Pending</p>
+                <% if (pendingTime) { %>
+                  <span class="text-[8px] font-mono text-slate-500 block leading-tight mt-0.5"><%= pendingTime.dateStr %></span>
+                  <span class="text-[8px] font-mono text-orange-600 block font-bold"><%= pendingTime.timeStr %></span>
+                <% } else { %>
+                  <span class="text-[8px] font-mono text-slate-300 block">Awaiting Log</span>
+                <% } %>
+              </div>
+            </div>
+
+            <!-- Step 2: Processing -->
+            <div class="flex md:flex-col items-center md:items-center text-left md:text-center gap-3 md:gap-2 z-10 w-full md:w-auto">
+              <div class="w-8 h-8 rounded-full border-2 border-slate-950 flex items-center justify-center font-mono text-xs font-black shadow-[1px_1px_0px_rgba(0,0,0,1)]
+                <%= currentStepIndex >= 1 ? 'bg-orange-500 text-white' : 'bg-white text-slate-300 border-slate-200 shadow-none' %>">
+                <i class="fa-solid fa-box-open"></i>
+              </div>
+              <div>
+                <p class="text-[10px] font-black uppercase tracking-wider <%= currentStepIndex >= 1 ? 'text-slate-950' : 'text-slate-300' %>">Processing</p>
+                <% if (processingTime) { %>
+                  <span class="text-[8px] font-mono text-slate-500 block leading-tight mt-0.5"><%= processingTime.dateStr %></span>
+                  <span class="text-[8px] font-mono text-orange-600 block font-bold"><%= processingTime.timeStr %></span>
+                <% } else { %>
+                  <span class="text-[8px] font-mono text-slate-300 block">Awaiting Log</span>
+                <% } %>
+              </div>
+            </div>
+
+            <!-- Step 3: Shipped -->
+            <div class="flex md:flex-col items-center md:items-center text-left md:text-center gap-3 md:gap-2 z-10 w-full md:w-auto">
+              <div class="w-8 h-8 rounded-full border-2 border-slate-950 flex items-center justify-center font-mono text-xs font-black shadow-[1px_1px_0px_rgba(0,0,0,1)]
+                <%= currentStepIndex >= 2 ? 'bg-blue-600 text-white' : 'bg-white text-slate-300 border-slate-200 shadow-none' %>">
+                <i class="fa-solid fa-truck-fast"></i>
+              </div>
+              <div>
+                <p class="text-[10px] font-black uppercase tracking-wider <%= currentStepIndex >= 2 ? 'text-slate-950' : 'text-slate-300' %>">Shipped</p>
+                <% if (shippedTime) { %>
+                  <span class="text-[8px] font-mono text-slate-500 block leading-tight mt-0.5"><%= shippedTime.dateStr %></span>
+                  <span class="text-[8px] font-mono text-orange-600 block font-bold"><%= shippedTime.timeStr %></span>
+                <% } else { %>
+                  <span class="text-[8px] font-mono text-slate-300 block">Awaiting Log</span>
+                <% } %>
+              </div>
+            </div>
+
+            <!-- Step 4: Delivered -->
+            <div class="flex md:flex-col items-center md:items-center text-left md:text-center gap-3 md:gap-2 z-10 w-full md:w-auto">
+              <div class="w-8 h-8 rounded-full border-2 border-slate-950 flex items-center justify-center font-mono text-xs font-black shadow-[1px_1px_0px_rgba(0,0,0,1)]
+                <%= currentStepIndex >= 3 ? 'bg-emerald-500 text-white' : 'bg-white text-slate-300 border-slate-200 shadow-none' %>">
+                <i class="fa-solid fa-house-chimney-user"></i>
+              </div>
+              <div>
+                <p class="text-[10px] font-black uppercase tracking-wider <%= currentStepIndex >= 3 ? 'text-slate-950' : 'text-slate-300' %>">Delivered</p>
+                <% if (deliveredTime) { %>
+                  <span class="text-[8px] font-mono text-slate-500 block leading-tight mt-0.5"><%= deliveredTime.dateStr %></span>
+                  <span class="text-[8px] font-mono text-emerald-600 block font-bold"><%= deliveredTime.timeStr %></span>
+                <% } else { %>
+                  <span class="text-[8px] font-mono text-slate-300 block">Awaiting Log</span>
+                <% } %>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 📦 Manifest Product Details & Summary -->
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Left: Customer Specs -->
+          <div class="space-y-3">
+            <h4 class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">// Logistical Manifest</h4>
+            <div class="text-xs space-y-1.5 font-sans text-slate-800 bg-slate-50 p-3 border border-slate-200">
+              <p><strong>Receiver:</strong> <%= order.name %></p>
+              <p><strong>Contact:</strong> <%= order.phone %></p>
+              <p class="pt-1 mt-1 border-t border-slate-200 leading-normal">
+                <strong class="text-[9px] font-mono uppercase tracking-wider block text-slate-400">Destination Address:</strong>
+                <%= order.address %>
+              </p>
+            </div>
+          </div>
+
+          <!-- Right: Item List Bundle -->
+          <div class="flex flex-col justify-between">
+            <div>
+              <h4 class="text-[10px] font-mono text-slate-400 uppercase tracking-widest mb-2">// Package Contents</h4>
+              <div class="space-y-2 max-h-[120px] overflow-y-auto pr-1">
+                <% order.items.forEach(item => { %>
+                  <div class="flex justify-between items-center text-xs border-b border-slate-100 pb-1.5">
+                    <span class="font-sans text-slate-900 font-bold truncate max-w-[160px]"><%= item.name %> <span class="text-slate-400 font-mono text-[10px]">×<%= item.quantity %></span></span>
+                    <span class="font-mono text-slate-700">৳<%= item.price * item.quantity %></span>
+                  </div>
+                <% }) %>
+              </div>
+            </div>
+
+            <!-- Total Cost Block -->
+            <div class="pt-3 mt-4 border-t border-slate-200 flex justify-between items-baseline">
+              <span class="text-[9px] font-mono uppercase font-bold text-slate-400">Amount Charged:</span>
+              <span class="text-sm font-black text-slate-950 font-mono bg-orange-50 text-orange-600 px-2 py-0.5 border border-orange-200">
+                ৳<%= order.totalAmount %>
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    <% } else if (searchedId === '') { %>
+      <!-- 🗺️ Standard Empty State Guide -->
+      <div class="text-center py-12 border-2 border-dashed border-slate-200 bg-white">
+        <i class="fa-solid fa-map-location-dot text-2xl text-slate-300 mb-2 block"></i>
+        <p class="text-xs font-mono text-slate-400 uppercase tracking-widest">Awaiting pipeline telemetry initialization.</p>
+      </div>
+    <% } %>
+
+  </div>
+</div>
+
+<%- include('partials/footer') %>

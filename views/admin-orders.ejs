@@ -1,0 +1,356 @@
+<%- include('partials/header') %>
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="w-full bg-[#f8fafc] py-8 px-2 md:px-6 min-h-screen">
+  <div class="max-w-6xl mx-auto">
+    
+    <!-- Title & Stats Section -->
+    <div class="border-b-2 border-slate-950 pb-3 mb-6 flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+      <h1 class="text-xl font-black text-slate-950 tracking-wider uppercase flex items-center gap-2">
+        <span class="w-1.5 h-4 bg-orange-600 block"></span> Live Order Pipeline
+      </h1>
+      <div class="text-[10px] text-slate-400 font-mono uppercase tracking-widest">
+        Total Stacked: <span id="total-orders-count"><%= orders ? orders.length : 0 %></span> Orders
+      </div>
+    </div>
+
+    <!-- 🔍 Live Phone Number Search Bar -->
+    <div class="mb-6">
+      <div class="relative max-w-md border-2 border-slate-950 shadow-[3px_3px_0px_rgba(15,23,42,1)] bg-white group transition-all">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400 group-focus-within:text-orange-600">
+          <i class="fa-solid fa-magnifying-glass text-xs"></i>
+        </span>
+        <input 
+          type="text" 
+          id="order-search-input"
+          placeholder="SEARCH CUSTOMER BY PHONE NUMBER..." 
+          class="w-full pl-9 pr-4 py-2.5 bg-transparent font-mono text-xs text-slate-950 focus:outline-none placeholder:text-slate-300 placeholder:font-mono uppercase tracking-wider"
+        />
+      </div>
+      <!-- No Match Notification Box -->
+      <div id="no-search-results" class="hidden text-center py-10 bg-white border-2 border-dashed border-slate-200 mt-4">
+        <i class="fa-solid fa-phone-slash text-xl text-slate-300 mb-2 block"></i>
+        <p class="text-xs font-mono text-slate-400 uppercase tracking-widest">No orders matching this phone number found.</p>
+      </div>
+    </div>
+
+    <!-- 📦 Orders Feed -->
+    <div class="space-y-6" id="orders-container-feed">
+      <% if (orders && orders.length > 0) { %>
+        <% orders.forEach(order => { %>
+          
+          <!-- Order Card Start -->
+          <div 
+            id="order-card-<%= order._id %>" 
+            data-phone="<%= order.phone %>"
+            class="order-card-block bg-white border-2 border-slate-950 p-4 shadow-[4px_4px_0px_rgba(15,23,42,1)] grid grid-cols-1 lg:grid-cols-3 gap-6 transition-all duration-300 hover:-translate-y-0.5"
+          >
+            
+            <!-- 1. Left Column: Customer Details -->
+            <div class="space-y-2 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-[8px] font-mono px-2 py-0.5 uppercase tracking-widest font-black border border-slate-950 shadow-[1px_1px_0px_rgba(0,0,0,1)] status-badge
+                    <%= order.status === 'Pending' ? 'bg-amber-100 text-amber-800' : '' %>
+                    <%= order.status === 'Processing' ? 'bg-orange-100 text-orange-600' : '' %>
+                    <%= order.status === 'Shipped' ? 'bg-blue-100 text-blue-600' : '' %>
+                    <%= order.status === 'Delivered' ? 'bg-emerald-100 text-emerald-800' : '' %>">
+                    <%= order.status %>
+                  </span>
+                  <span class="text-[9px] font-mono 
+                  text-slate-400">ID : <%= order.orderId %></span>
+                </div>
+                
+                <h3 class="text-xs font-black text-slate-950 font-sans mt-3 uppercase tracking-wide flex items-center gap-1.5">
+                  <i class="fa-solid fa-user-tag text-slate-400 text-[10px]"></i> <%= order.name %>
+                </h3>
+                <p class="text-xs font-mono text-slate-700 font-bold mt-1">
+                  <i class="fa-solid fa-phone text-slate-400 mr-1"></i> <span><%= order.phone %></span>
+                </p>
+                <% if(order.email) { %>
+                  <p class="text-[11px] font-mono text-slate-400 truncate"><i class="fa-regular fa-envelope text-slate-400 mr-1"></i> <%= order.email %></p>
+                <% } %>
+              </div>
+              
+              <div class="text-[11px] font-sans text-slate-600 leading-normal bg-slate-50 p-2.5 border border-slate-200 mt-2">
+                <span class="text-[8px] font-mono text-slate-400 block uppercase tracking-widest mb-0.5">Ship To:</span>
+                <%= order.address %>
+              </div>
+            </div>
+
+            <!-- 2. Center Column: Product Items List (Scrollable if > 3 items) -->
+            <div class="border-t lg:border-t-0 lg:border-x-2 border-dashed border-slate-200 lg:px-5 py-3 lg:py-0 flex flex-col justify-between">
+              <div>
+                <span class="text-[8px] text-slate-400 font-mono uppercase tracking-widest block mb-2">// Manifest Items</span>
+                
+                <div class="space-y-2 max-h-[145px] overflow-y-auto pr-1">
+                  <% order.items.forEach(item => { %>
+                    <div class="flex items-center justify-between text-xs gap-3 py-1.5 border-b border-slate-100">
+                      <div class="flex items-center gap-2 truncate">
+                        <img src="<%= item.image %>" alt="" class="w-7 h-7 object-cover border border-slate-950 bg-slate-50 flex-shrink-0">
+                        <div class="truncate">
+                          <span class="text-slate-900 truncate font-sans font-bold block leading-tight"><%= item.name %></span>
+                          <span class="font-mono text-[9px] text-slate-400 block mt-0.5">৳<%= item.price %> × <%= item.quantity %></span>
+                        </div>
+                      </div>
+                      <span class="font-mono text-slate-900 font-bold text-[11px] flex-shrink-0 bg-slate-50 px-1.5 py-0.5 border border-slate-100">
+                        ৳<%= item.price * item.quantity %>
+                      </span>
+                    </div>
+                  <% }) %>
+                </div>
+              </div>
+              
+              <div class="pt-3 mt-2 border-t border-slate-100 flex justify-between items-baseline">
+                <span class="text-[9px] font-mono uppercase font-bold text-slate-400">Net Payable:</span>
+                <span class="text-sm font-black text-slate-950 font-mono bg-orange-50 text-orange-600 px-2 py-0.5 border border-orange-200">৳<%= order.totalAmount %></span>
+              </div>
+            </div>
+
+            <!-- 3. Right Column: Pipeline Buttons Control & [ADDED] Delete Node -->
+            <div class="flex flex-col justify-between bg-slate-50/60 p-3 border border-slate-100 space-y-4">
+              <div class="space-y-2 w-full">
+                <span class="text-[8px] text-slate-400 font-mono uppercase tracking-widest block text-center mb-1">// Automation Nodes</span>
+                
+                <!-- Confirm Button -->
+                <button 
+                  onclick="updateStatus('<%= order._id %>', 'Processing')"
+                  class="status-btn-Processing w-full font-mono text-[10px] font-black py-2.5 uppercase tracking-widest transition-all border border-slate-950 shadow-[1px_1px_0px_rgba(0,0,0,1)]
+                  <%= order.status === 'Pending' ? 'bg-orange-600 hover:bg-orange-700 text-white active:translate-y-0.5' : 'bg-slate-100 text-slate-300 border-slate-200 shadow-none cursor-not-allowed' %>"
+                  <%= order.status !== 'Pending' ? 'disabled' : '' %>>
+                  <i class="fa-solid fa-circle-check mr-1.5"></i> Confirm Order
+                </button>
+
+                <!-- Shipped Button -->
+                <button 
+                  onclick="updateStatus('<%= order._id %>', 'Shipped')"
+                  class="status-btn-Shipped w-full font-mono text-[10px] font-black py-2.5 uppercase tracking-widest transition-all border border-slate-950 shadow-[1px_1px_0px_rgba(0,0,0,1)]
+                  <%= order.status === 'Processing' ? 'bg-slate-950 hover:bg-slate-800 text-white active:translate-y-0.5' : 'bg-slate-100 text-slate-300 border-slate-200 shadow-none cursor-not-allowed' %>"
+                  <%= order.status !== 'Processing' ? 'disabled' : '' %>>
+                  <i class="fa-solid fa-truck-ramp-box mr-1.5"></i> Ship Cargo
+                </button>
+
+                <!-- Delivered Button -->
+                <button 
+                  onclick="updateStatus('<%= order._id %>', 'Delivered')"
+                  class="status-btn-Delivered w-full font-mono text-[10px] font-black py-2.5 uppercase tracking-widest transition-all border border-slate-950 shadow-[1px_1px_0px_rgba(0,0,0,1)]
+                  <%= order.status === 'Shipped' ? 'bg-emerald-600 hover:bg-emerald-700 text-white active:translate-y-0.5' : 'bg-slate-100 text-slate-300 border-slate-200 shadow-none cursor-not-allowed' %>"
+                  <%= order.status !== 'Shipped' ? 'disabled' : '' %>>
+                  <i class="fa-solid fa-house-chimney-user mr-1.5"></i> Out For Delivery
+                </button>
+              </div>
+
+              <!-- 🗑️ [ADDED] Neo-Brutalism Delete Button Section -->
+              <div class="border-t border-slate-200/80 pt-2 w-full">
+                <button 
+                  onclick="deleteOrder('<%= order._id %>')"
+                  class="w-full font-mono text-[9px] font-bold py-1.5 bg-red-50 hover:bg-red-500 text-red-600 hover:text-white transition-all duration-150 uppercase tracking-wider border border-red-600 active:translate-y-0.5 shadow-[1px_1px_0px_rgba(220,38,38,1)]"
+                >
+                  <i class="fa-solid fa-trash-can mr-1"></i> Delete Order
+                </button>
+              </div>
+            </div>
+
+          </div>
+          <!-- Order Card End -->
+          
+        <% }) %>
+      <% } else { %>
+        <div id="empty-state-logs" class="text-center py-20 bg-white border-2 border-dashed border-slate-200">
+          <i class="fa-solid fa-folder-open text-3xl text-slate-300 mb-2 block"></i>
+          <p class="text-xs font-mono text-slate-400 uppercase tracking-widest">No order cycles captured inside the database.</p>
+        </div>
+      <% } %>
+    </div>
+
+  </div>
+</div>
+
+<%- include('partials/footer') %>
+
+<script type="text/javascript">
+  // 🔍 Live Frontend Search Engine
+  const searchInput = document.getElementById('order-search-input');
+  const noResultsBlock = document.getElementById('no-search-results');
+  
+  if (searchInput) {
+    searchInput.addEventListener('input', function(e) {
+      const searchTerm = e.target.value.trim();
+      const cards = document.querySelectorAll('.order-card-block');
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const phoneData = card.getAttribute('data-phone') || '';
+        if (phoneData.includes(searchTerm)) {
+          card.style.display = '';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      if (visibleCount === 0 && cards.length > 0) {
+        noResultsBlock.classList.remove('hidden');
+      } else {
+        noResultsBlock.classList.add('hidden');
+      }
+    });
+  }
+
+  // ⚙️ Status Update Workflow Engine
+  async function updateStatus(orderId, targetStatus) {
+    try {
+      Swal.fire({
+        title: 'Updating Node...',
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); }
+      });
+
+      const response = await fetch('/admin/api/orders/update-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, status: targetStatus })
+      });
+
+      if (!response.ok) throw new Error('Network response code error');
+      const data = await response.json();
+
+      if (data.success) {
+        Swal.close();
+        const card = document.querySelector(`#order-card-${orderId}`);
+        const badge = card.querySelector('.status-badge');
+        
+        if(badge) {
+          badge.className = "text-[8px] font-mono px-2 py-0.5 uppercase tracking-widest font-black border border-slate-950 shadow-[1px_1px_0px_rgba(0,0,0,1)] status-badge ";
+          badge.innerText = targetStatus;
+
+          if(targetStatus === 'Processing') badge.classList.add('bg-orange-100', 'text-orange-600');
+          if(targetStatus === 'Shipped') badge.classList.add('bg-blue-100', 'text-blue-600');
+          if(targetStatus === 'Delivered') badge.classList.add('bg-emerald-100', 'text-emerald-800');
+        }
+
+        const btnConfirm = card.querySelector('.status-btn-Processing');
+        const btnShipped = card.querySelector('.status-btn-Shipped');
+        const btnDelivered = card.querySelector('.status-btn-Delivered');
+
+        [btnConfirm, btnShipped, btnDelivered].forEach(btn => {
+          btn.setAttribute('disabled', 'true');
+          btn.className = btn.className.replace(/bg-(orange|slate|emerald)-(600|950|700|800)/g, '').replace('text-white', '');
+          btn.classList.add('bg-slate-100', 'text-slate-300', 'border-slate-200', 'shadow-none', 'cursor-not-allowed');
+        });
+
+        if (targetStatus === 'Processing') {
+          btnShipped.removeAttribute('disabled');
+          btnShipped.classList.remove('bg-slate-100', 'text-slate-300', 'border-slate-200', 'shadow-none', 'cursor-not-allowed');
+          btnShipped.classList.add('bg-slate-950', 'hover:bg-slate-800', 'text-white', 'shadow-[1px_1px_0px_rgba(0,0,0,1)]');
+        } else if (targetStatus === 'Shipped') {
+          btnDelivered.removeAttribute('disabled');
+          btnDelivered.classList.remove('bg-slate-100', 'text-slate-300', 'border-slate-200', 'shadow-none', 'cursor-not-allowed');
+          btnDelivered.classList.add('bg-emerald-600', 'hover:bg-emerald-700', 'text-white', 'shadow-[1px_1px_0px_rgba(0,0,0,1)]');
+        }
+
+        Swal.fire({
+          icon: 'success',
+          title: `Status set to ${targetStatus}`,
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 1500,
+          background: '#0f172a',
+          color: '#fff'
+        });
+      } else {
+        Swal.fire('Failed', data.message || 'Error updating workflow.', 'error');
+      }
+    } catch (error) {
+      console.error(error);
+      Swal.fire('Error', 'Network error or route mismatch.', 'error');
+    }
+  }
+
+  // 🗑️ [ADDED] Live Order Destruction Node
+  async function deleteOrder(orderId) {
+    try {
+      // ডিলিট করার আগে কনফার্মেশন পপআপ
+      const alertResult = await Swal.fire({
+        title: 'Are you sure?',
+        text: "This will permanently wipe the order cycle from history!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#0f172a',
+        confirmButtonText: 'Yes, delete it!',
+        background: '#ffffff',
+        customClass: {
+          popup: 'border-2 border-slate-950 rounded-none shadow-[4px_4px_0px_rgba(0,0,0,1)]',
+          confirmButton: 'font-mono uppercase tracking-wider text-xs rounded-none border border-slate-950',
+          cancelButton: 'font-mono uppercase tracking-wider text-xs rounded-none border border-slate-950'
+        }
+      });
+
+      if (alertResult.isConfirmed) {
+        Swal.fire({
+          title: 'Purging Order...',
+          allowOutsideClick: false,
+          didOpen: () => { Swal.showLoading(); }
+        });
+
+        // ডিলিট API তে রিকোয়েস্ট হিট করা
+        const response = await fetch(`/admin/api/orders/delete/${orderId}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!response.ok) throw new Error('Delete network route error');
+        const data = await response.json();
+
+        if (data.success) {
+          Swal.close();
+          
+          const card = document.querySelector(`#order-card-${orderId}`);
+          if (card) {
+            // কার্ডের স্কেল কমিয়ে ভ্যানিশ করার অ্যানিমেশন ইফেক্ট
+            card.style.transform = 'scale(0.95)';
+            card.style.opacity = '0';
+            
+            setTimeout(() => {
+              card.remove(); // ডম থেকে টোটাল রিমুভ
+              
+              // কাউন্টার আপডেট করা
+              const counterSpan = document.getElementById('total-orders-count');
+              const remainingCards = document.querySelectorAll('.order-card-block').length;
+              if(counterSpan) counterSpan.innerText = remainingCards;
+              
+              // যদি কোনো অর্ডার না থাকে তবে এম্পটি স্টেট শো করানো
+              if (remainingCards === 0) {
+                const feed = document.getElementById('orders-container-feed');
+                feed.innerHTML = `
+                  <div id="empty-state-logs" class="text-center py-20 bg-white border-2 border-dashed border-slate-200">
+                    <i class="fa-solid fa-folder-open text-3xl text-slate-300 mb-2 block"></i>
+                    <p class="text-xs font-mono text-slate-400 uppercase tracking-widest">No order cycles captured inside the database.</p>
+                  </div>`;
+              }
+            }, 300);
+          }
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Order Purged Successfully',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000,
+            background: '#1e293b',
+            color: '#fff'
+          });
+        } else {
+          Swal.fire('Error', data.message || 'Wipe lifecycle failed.', 'error');
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      Swal.fire('Error', 'Network connection failure or route definition missing.', 'error');
+    }
+  }
+</script>

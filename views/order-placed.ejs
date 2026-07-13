@@ -1,0 +1,191 @@
+<%- include('partials/header') %>
+
+<div class="w-full bg-[#f8fafc] py-12 px-4 min-h-screen flex flex-col items-center justify-center">
+  <div class="w-full max-w-xl bg-white border-2 border-slate-950 p-6 sm:p-8 shadow-[6px_6px_0px_rgba(15,23,42,1)] relative overflow-hidden">
+    
+    <!-- Decorative Corner Tag -->
+    <div class="absolute top-0 right-0 bg-emerald-500 text-slate-950 font-mono text-[9px] font-black px-4 py-1 uppercase tracking-widest border-b-2 border-l-2 border-slate-950">
+      // SUCCESS_NODE
+    </div>
+
+    <!-- 🎉 Success Header -->
+    <div class="text-center mb-8 mt-4">
+      <div class="w-16 h-16 bg-emerald-100 border-2 border-slate-950 rounded-full flex items-center justify-center mx-auto mb-4 shadow-[2px_2px_0px_rgba(15,23,42,1)]">
+        <i class="fa-solid fa-circle-check text-2xl text-emerald-600"></i>
+      </div>
+      <h1 class="text-2xl font-black text-slate-950 tracking-wide uppercase">Manifest Acknowledged!</h1>
+      <p class="text-xs font-mono text-slate-400 mt-1 uppercase tracking-widest">Your order has been logged into the grid.</p>
+    </div>
+
+    <!-- 📋 Copyable Order ID Container -->
+    <div class="bg-slate-50 border-2 border-slate-950 p-4 mb-6 relative">
+      <span class="text-[9px] font-mono text-slate-400 uppercase tracking-widest block mb-1">// Tracking Registry Link</span>
+      
+      <div class="flex items-center justify-between bg-white border border-slate-300 p-3 rounded-none">
+        <span id="orderIdTarget" class="font-mono text-base font-black text-orange-600 tracking-wider">#<%= order.orderId %></span>
+        
+        <!-- Clipboard Copy Button -->
+        <button 
+          onclick="copyOrderId()" 
+          id="copyBtn"
+          class="bg-slate-950 hover:bg-slate-800 text-white font-mono text-[10px] font-black px-3 py-1.5 uppercase tracking-widest transition-all shadow-[1px_1px_0px_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-none"
+        >
+          <i class="fa-regular fa-copy mr-1"></i> Copy ID
+        </button>
+      </div>
+      <p class="text-[10px] font-sans text-slate-500 mt-2">Use this 6-digit tracking node to monitor cargo flow on our tracking terminal.</p>
+    </div>
+
+    <!-- 📦 Summary Specs -->
+    <div class="border-t-2 border-dashed border-slate-200 pt-5 mb-8">
+      <h3 class="text-xs font-mono font-black text-slate-950 uppercase tracking-wider mb-3">// Package Manifest</h3>
+      
+      <!-- Customer Info Mini-Grid -->
+      <div class="grid grid-cols-2 gap-4 bg-slate-50 p-3 border border-slate-200 text-xs font-sans mb-4">
+        <div>
+          <span class="text-[9px] font-mono text-slate-400 block uppercase tracking-tight">Receiver:</span>
+          <span class="font-bold text-slate-900"><%= order.name %></span>
+        </div>
+        <div>
+          <span class="text-[9px] font-mono text-slate-400 block uppercase tracking-tight">Contact Node:</span>
+          <span class="font-mono text-slate-700"><%= order.phone %></span>
+        </div>
+        <div class="col-span-2 border-t border-slate-200 pt-2">
+          <span class="text-[9px] font-mono text-slate-400 block uppercase tracking-tight">Destination Dropzone:</span>
+          <span class="text-slate-800 leading-relaxed"><%= order.address %></span>
+        </div>
+      </div>
+
+      <!-- Items Summary List -->
+      <div class="space-y-2 max-h-[150px] overflow-y-auto pr-1">
+        <% order.items.forEach(item => { %>
+          <div class="flex justify-between items-center text-xs pb-1.5 border-b border-slate-100">
+            <span class="font-sans font-bold text-slate-900 truncate max-w-[240px]">
+              <%= item.name %> <span class="text-slate-400 font-mono text-[10px]">×<%= item.quantity %></span>
+            </span>
+            <span class="font-mono text-slate-700">৳<%= item.price * item.quantity %></span>
+          </div>
+        <% }) %>
+      </div>
+
+      <!-- Total Amount Node -->
+      <div class="mt-4 pt-3 border-t-2 border-slate-950 flex justify-between items-baseline">
+        <span class="text-[10px] font-mono uppercase font-black text-slate-950">Total Capital Captured:</span>
+        <span class="text-base font-black font-mono text-orange-600 bg-orange-50 px-3 py-1 border border-orange-200">
+          ৳<%= order.totalAmount %>
+        </span>
+      </div>
+    </div>
+
+    <!-- 🛠️ Navigation Controls -->
+    <div class="flex flex-col sm:flex-row gap-3">
+      <a 
+        href="/track" 
+        class="flex-1 text-center bg-white hover:bg-slate-50 text-slate-950 font-mono text-xs font-black py-3 uppercase tracking-widest transition-all border-2 border-slate-950 shadow-[3px_3px_0px_rgba(15,23,42,1)] active:translate-y-0.5 active:shadow-none"
+      >
+        Track Terminal
+      </a>
+      <a 
+        href="/products/search" 
+        class="flex-1 text-center bg-orange-600 hover:bg-orange-700 text-white font-mono text-xs font-black py-3 uppercase tracking-widest transition-all border-2 border-slate-950 shadow-[3px_3px_0px_rgba(15,23,42,1)] active:translate-y-0.5 active:shadow-none"
+      >
+        Return to Market
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<!-- 📋 Native Clipboard Logic Script -->
+<script>
+  function copyOrderId() {
+    // হ্যাস (#) বাদ দিয়ে শুধু বিশুদ্ধ আইডি টেক্সট কপি করার জন্য
+    const textToCopy = document.getElementById('orderIdTarget').innerText.replace('#', '');
+    
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      const copyBtn = document.getElementById('copyBtn');
+      // বাটন ইন্টারফেস সাময়িকভাবে সাকসেস স্টেট দেখাবে
+      copyBtn.innerHTML = '<i class="fa-solid fa-check mr-1 text-emerald-400"></i> Copied!';
+      copyBtn.classList.remove('bg-slate-950');
+      copyBtn.classList.add('bg-slate-900');
+      
+      // ২ সেকেন্ড পর আবার নরমাল স্টেটে ফিরে যাবে
+      setTimeout(() => {
+        copyBtn.innerHTML = '<i class="fa-regular fa-copy mr-1"></i> Copy ID';
+        copyBtn.classList.remove('bg-slate-900');
+        copyBtn.classList.add('bg-slate-950');
+      }, 2000);
+    }).catch(err => {
+      console.error('Failed to capture node telemetry into clipboard:', err);
+    });
+  }
+</script>
+
+
+
+<script>
+  function triggerOrderNotification() {
+    // W3Schools বা আইফ্রেম এনভায়রনমেন্টের জন্য সেফটি হ্যান্ডলার
+    const targetWindow = window.parent || window;
+    const TargetNotification = targetWindow.Notification;
+
+    if (!TargetNotification) {
+      console.log("Browser does not support notifications.");
+      return;
+    }
+
+    // আপনার ডাইনামিক ইজেএস ডাটা জাভাস্ক্রিপ্টে নেওয়া হচ্ছে
+    const orderId = "<%= order.orderId %>";
+    const totalAmount = "<%= order.totalAmount %>";
+
+    // নোটিফিকেশনের কনফিগারেশন
+    const options = {
+      body: `আপনার #${orderId} অর্ডারটি সফলভাবে রেজিস্টার্ড হয়েছে। মোট বিল: ৳${totalAmount}।`,
+      
+      // নোটিফিকেশনের ছোট লোগো (আপনার শপের লোগো দিতে পারেন)
+      icon: "https://i.ibb.co.com/s9kzDV0D/Messenger-creation-334-D5120-0957-42-F9-9808-B39161-E7-FA85-01-removebg-preview.png", 
+      
+      // ভেতরের বড় ব্যানার ইমেজ
+      image: "https://picsum.photos/600/300", 
+      
+      // মোবাইলে ভাইব্রেশন প্যাটার্ন (ক্লিক-পজ-ক্লিক)
+      vibrate: [200, 100, 200],
+      
+      // ইউজার ডিসমিস না করা পর্যন্ত নোটিফিকেশনটি স্ক্রিনে পিন থাকবে
+      requireInteraction: true 
+    };
+
+    // পারমিশন স্ট্যাটাস চেক এবং নোটিফিকেশন ট্রিগার
+    if (TargetNotification.permission === "granted") {
+      const notification = new TargetNotification("অর্ডার সফল হয়েছে! 📦🎉", options);
+      
+      // নোটিফিকেশনে ক্লিক করলে সরাসরি কাস্টমার ট্র্যাকিং টার্মিনালে চলে যাবে
+      notification.onclick = function() {
+        window.focus();
+        window.location.href = `/track?orderId=${orderId}`;
+      };
+
+    } else if (TargetNotification.permission !== "denied") {
+      // পারমিশন না নেওয়া থাকলে রিকোয়েস্ট করবে
+      TargetNotification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          const notification = new TargetNotification("অর্ডার সফল হয়েছে! 📦🎉", options);
+          notification.onclick = function() {
+            window.focus();
+            window.location.href = `/track?orderId=${orderId}`;
+          };
+        }
+      });
+    }
+  }
+
+  // পেজ লোড হওয়ার সাথে সাথেই স্বয়ংক্রিয়ভাবে নোটিফিকেশনটি ফায়ার হবে
+  document.addEventListener("DOMContentLoaded", () => {
+    // ব্রাউজার সিকিউরিটির জন্য সামান্য ডিলে (delay) দিয়ে ট্রিগার করা ভালো
+    setTimeout(triggerOrderNotification, 800);
+  });
+</script>
+
+
+
+<%- include('partials/footer') %>

@@ -1,0 +1,193 @@
+<%- include('partials/header') %>
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="w-full bg-[#f8fafc] py-8 px-2 md:px-4 font-sans">
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Title Section -->
+    <div class="border-b-2 border-slate-950 pb-2 mb-6 flex items-baseline justify-between">
+      <h1 class="text-xl font-black text-slate-950 tracking-wider uppercase flex items-center gap-2">
+        <span class="w-1.5 h-4 bg-orange-600 block"></span> Product Categories
+      </h1>
+      <span class="text-[9px] text-slate-400 font-mono tracking-widest uppercase">// Category Grid</span>
+    </div>
+
+    <!-- 📦 DYNAMIC CATEGORIES CONTAINER -->
+    <div id="categories-root" class="space-y-12">
+      <!-- ডাটা প্রোসেস হওয়ার সময় লোডার -->
+      <div class="flex flex-col justify-center items-center py-20 gap-3">
+        <div class="animate-spin rounded-full h-6 w-6 border-2 border-orange-600 border-t-transparent"></div>
+        <p class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Initializing Inventory Grid...</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<%- include('partials/footer') %>
+
+<!-- ⚙️ FRONTEND CLIENT-SIDE PAGINATION ENGINE -->
+<script type="text/javascript">
+  // ব্যাকএন্ড থেকে আসা সম্পূর্ণ প্রোডাক্ট অবজেক্ট
+  const allProducts = <%- JSON.stringify(products) %>; 
+  
+  // প্রতি ক্লিকে কয়টি করে প্রোডাক্ট লোড হবে এবং বর্তমান স্টেট ট্র্যাকিং
+  const categoryLimits = {};
+  const ITEMS_PER_PAGE = 20;
+
+  // প্রোডাক্টগুলোকে ক্যাটাগরি নাম অনুযায়ী গ্রুপ করার ফাংশন
+  function groupProductsByCategory(products) {
+    return products.reduce((groups, product) => {
+      const category = product.category ? product.category.trim() : 'Others';
+      if (!groups[category]) {
+        groups[category] = [];
+      }
+      groups[category].push(product);
+      return groups;
+    }, {});
+  }
+
+  // লোড মোর বাটনের ক্লিক ইভেন্ট হ্যান্ডলার
+  function loadMore(categoryName) {
+    categoryLimits[categoryName] += ITEMS_PER_PAGE;
+    renderCategories(); // পেজ রিফ্রেশ ছাড়া রেন্ডার হবে
+  }
+
+  // স্ক্রিনে ক্যাটাগরি ও প্রোডাক্ট রেন্ডার করার কোর আর্কিটেকচার
+  function renderCategories() {
+    const root = document.getElementById('categories-root');
+    const grouped = groupProductsByCategory(allProducts);
+    
+    if (Object.keys(grouped).length === 0) {
+      root.innerHTML = `
+        <div class="text-center py-16 bg-white border border-slate-200 rounded-xl shadow-sm">
+          <p class="text-sm font-medium text-slate-500">No products found in store inventory.</p>
+        </div>`;
+      return;
+    }
+
+    let htmlContent = '';
+
+    for (const [category, products] of Object.entries(grouped)) {
+      
+      if (categoryLimits[category] === undefined) {
+        categoryLimits[category] = ITEMS_PER_PAGE;
+      }
+
+      const currentLimit = categoryLimits[category];
+      const visibleProducts = products.slice(0, currentLimit);
+      const hasMore = products.length > currentLimit;
+
+      htmlContent += `
+        <!-- Category Segment Component -->
+        <div class="bg-white  rounded-md p-4 ">
+          
+          <!-- Category Label & Count Header -->
+          <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-2">
+            <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2 uppercase tracking-wide">
+              <span class="w-1.5 h-3.5 bg-orange-600"></span>
+              ${category} 
+              <span class="text-[10px] font-mono font-medium text-slate-400 lowercase">(${products.length} items)</span>
+            </h2>
+          </div>
+
+          <!-- Product Inner Grid (ক্যাপসুল স্টাইল টাইট ডিজাইন) -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            ${visibleProducts.map(p => {
+              // ⚡ আপনার সেই ইমেজ লজিক: অ্যারে চেক করে ১ম টা নেবে, যদি না থাকে তবে সিঙ্গেল ফিল্ড বা প্লেসহোল্ডার
+              const productImg = (p.images && Array.isArray(p.images) && p.images.length > 0) 
+                                 ? p.images[0] 
+                                 : (p.image || p.img || 'https://via.placeholder.com/300');
+              
+              const orig = p.price || 250;
+              const cur = p.isDiscount && p.discountPrice ? p.discountPrice : orig;
+              const pct = (p.isDiscount && orig > cur) ? Math.round(((orig - cur) / orig) * 100) : 0;
+
+              return `
+              <div class="bg-white flex flex-col justify-between group overflow-hidden hover:-translate-y-1 hover:shadow-lg shadow-md transition-all duration-300 relative border border-slate-100 rounded-md">
+
+                <!-- Image Frame -->
+                <a href="/products/details/${p._id}" class="block aspect-square bg-slate-50 overflow-hidden relative border-b border-slate-100/60">
+                  <img class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" 
+                       src="${productImg}" 
+                       alt="${p.name}"
+                       onerror="this.onerror=null;this.src='https://via.placeholder.com/300';">
+
+                  ${p.isNewArrival ? `<span class="absolute top-2 left-2 bg-slate-950 text-white font-mono text-[8px] font-bold uppercase px-1.5 py-0.5 tracking-wider">New</span>` : ''}
+                  ${pct ? `<span class="absolute top-2 right-2 bg-red-600 text-white font-mono text-[8px] font-bold uppercase px-1.5 py-0.5 tracking-wider">-${pct}%</span>` : ''}
+                </a>
+
+                <!-- Content Frame -->
+                <div class="p-3 flex-grow flex flex-col justify-between">
+                  <div>
+                    <a href="/products/details/${p._id}">
+                      <h3 class="text-xs font-bold text-slate-800 line-clamp-1 group-hover:text-orange-600 transition-colors duration-200 leading-tight">${p.name}</h3>
+                    </a>
+                  </div>
+
+                  <!-- Price & Button -->
+                  <div class="mt-2 pt-2 border-t border-dashed border-slate-100">
+                    <div class="flex items-baseline gap-1.5 mb-2">
+                      <span class="text-xs font-black text-slate-950 tracking-tight">৳${cur}</span>
+                      ${pct ? `<span class="text-[9px] text-slate-400 line-through">৳${orig}</span>` : ''}
+                    </div>
+                    <button data-id="${p._id}" data-name="${p.name}" data-price="${cur}" data-image="${productImg}" class="add-btn w-full bg-slate-950 group-hover:bg-orange-600 text-white font-mono font-bold text-[9px] py-2 uppercase tracking-widest transition-colors duration-300">
+                      + Add To Cart
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+              `;
+            }).join('')}
+          </div>
+
+          <!-- Load More Button -->
+          ${hasMore ? `
+            <div class="text-center mt-6 pt-4 border-t border-slate-50">
+              <button onclick="loadMore('${category.replace(/'/g, "\\'")}')" 
+                      class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 font-mono font-bold text-[9px] px-5 py-2 border border-slate-300 rounded shadow-sm transition-all active:scale-95 focus:outline-none tracking-widest uppercase">
+                + Load More
+              </button>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    root.innerHTML = htmlContent;
+  }
+
+  // কার্ট লজিক ইন্টিগ্রেশন (আপনার মেইন কোডের মতো)
+  document.getElementById('categories-root').addEventListener('click', e => {
+    if (!e.target.classList.contains('add-btn')) return;
+    const b = e.target;
+    const prod = { id: b.dataset.id, name: b.dataset.name, price: parseFloat(b.dataset.price), image: b.dataset.image, quantity: 1 };
+
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const exist = cart.find(i => i.id === prod.id);
+    exist ? exist.quantity++ : cart.push(prod);
+    localStorage.setItem('cart', JSON.stringify(cart));
+
+    window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { totalItems: cart.reduce((s, i) => s + i.quantity, 0) } }));
+
+    Swal.fire({
+      title: 'Added to Cart',
+      text: prod.name,
+      icon: 'success',
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 1500,
+      background: '#0f172a',
+      color: '#fff',
+      iconColor: 'green'
+    });
+  });
+
+  // DOM রেডি হলে রান হবে
+  document.addEventListener('DOMContentLoaded', () => {
+    renderCategories();
+  });
+</script>

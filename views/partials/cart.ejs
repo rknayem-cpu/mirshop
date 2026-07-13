@@ -1,0 +1,25 @@
+<!-- কার্ট এলিমেন্ট এবং পিওর সিম্পল sup tag -->
+<a href="/cart" class="relative active:opacity-60  inline-block p-2" >
+  <i class="fa-solid fa-bag-shopping text-2xl text-blue-800"></i>
+  <sup id="cart-counter" class=" 
+   text-black  font-mono text-[12px] 
+   font-bold px-1.5 py-0.5 absolute top-1 -right-1">0</sup>
+</a>
+
+<!-- কার্টের ওখানেই ট্র্যাকিং স্ক্রিপ্ট -->
+<script type="text/javascript">
+  (function() {
+    const counterEl = document.querySelector('#cart-counter');
+
+    // লোকালস্টোরেজ থেকে কার্টের টোটাল আইটেম সংখ্যা বের করার ছোট ফাংশন
+    const getCount = () => (JSON.parse(localStorage.getItem('cart')) || []).reduce((sum, item) => sum + item.quantity, 0);
+    
+    // পেজ প্রথমবার লোড বা রিলোড হলে সাথে সাথে সংখ্যা বসানো
+    if (counterEl) counterEl.innerText = getCount();
+
+    // 🔥 প্রোডাক্ট পেজের কাস্টম ইভেন্ট (cartUpdated) ট্র্যাক করে লাইভ সংখ্যা চেঞ্জ করা
+    window.addEventListener('cartUpdated', (e) => {
+      if (counterEl) counterEl.innerText = e.detail.totalItems;
+    });
+  })();
+</script>

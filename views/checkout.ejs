@@ -1,0 +1,190 @@
+<%- include('partials/header') %>
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="w-full bg-[#f8fafc] py-8 px-4 md:px-4 min-h-[80vh]">
+  <div class="max-w-5xl mx-auto">
+    
+    <!-- Title Section -->
+    <div class="border-b-2 border-slate-950 pb-2 mb-6">
+      <h1 class="text-xl font-black text-slate-950 tracking-wider uppercase flex items-center gap-2">
+        <span class="w-1.5 h-4 bg-orange-600 block"></span> Shipping & Checkout
+      </h1>
+    </div>
+
+    <!-- Checkout Layout -->
+    <div id="checkout-container" class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      
+      <!-- Left Column: Shipping Form -->
+      <div class="lg:col-span-2 bg-white border border-slate-100 p-6 shadow-[1px_1px_0px_rgba(0,0,0,0.03)]">
+        <h2 class="text-xs font-black text-slate-950 uppercase tracking-widest border-b border-slate-100 pb-2 mb-4">Shipping Address</h2>
+        
+        <form id="checkout-form" class="space-y-4 text-xs font-mono text-slate-700">
+          <!-- Full Name -->
+          <div>
+            <label class="block font-bold uppercase text-slate-500 mb-1 tracking-wider">Full Name *</label>
+            <input type="text" id="cust-name" required placeholder="John Doe" class="w-full bg-slate-50 border border-slate-200 text-slate-800 p-2.5 focus:outline-none focus:border-slate-950 transition-colors">
+          </div>
+
+          <!-- Grid for Phone & Email -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block font-bold uppercase text-slate-500 mb-1 tracking-wider">Phone Number *</label>
+              <input type="tel" id="cust-phone" required placeholder="017XXXXXXXX" class="w-full bg-slate-50 border border-slate-200 text-slate-800 p-2.5 focus:outline-none focus:border-slate-950 transition-colors">
+            </div>
+            <div>
+              <label class="block font-bold uppercase text-slate-500 mb-1 tracking-wider">Email Address (Optional)</label>
+              <input type="email" id="cust-email" placeholder="alex@example.com" class="w-full bg-slate-50 border border-slate-200 text-slate-800 p-2.5 focus:outline-none focus:border-slate-950 transition-colors">
+            </div>
+          </div>
+
+          <!-- Full Address -->
+          <div>
+            <label class="block font-bold uppercase text-slate-500 mb-1 tracking-wider">Full Delivery Address *</label>
+            <textarea id="cust-address" required rows="3" placeholder="House/Road, Area, City" class="w-full bg-slate-50 border border-slate-200 text-slate-800 p-2.5 focus:outline-none focus:border-slate-950 transition-colors"></textarea>
+          </div>
+
+          <!-- Payment Note -->
+          <div class="p-3 bg-slate-50 border border-slate-100/80 flex items-center gap-2">
+            <i class="fa-solid fa-truck-fast text-orange-600 text-sm"></i>
+            <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Payment Method: Cash on Delivery (COD)</span>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="w-full bg-slate-950 hover:bg-orange-600 text-white font-bold py-3 uppercase tracking-widest transition-colors duration-300">
+            Confirm & Place Order
+          </button>
+        </form>
+      </div>
+
+      <!-- Right Column: Slim Summary Overview -->
+      <div class="bg-white border border-slate-100 p-4 shadow-[1px_1px_0px_rgba(0,0,0,0.05)]">
+        <h2 class="text-xs font-black text-slate-950 uppercase tracking-widest border-b border-slate-100 pb-2 mb-3">Items Review</h2>
+        
+        <!-- Cart Items Preview Box -->
+        <div id="checkout-items-preview" class="divide-y divide-slate-100 max-h-[260px] overflow-y-auto mb-4 pr-1">
+          <!-- JS দিয়ে ছোট ইমেজসহ রেন্ডার হবে -->
+        </div>
+
+        <div class="space-y-2 text-[11px] font-mono text-slate-600 border-t border-slate-100 pt-3">
+          <div class="flex justify-between">
+            <span>Subtotal</span>
+            <span id="checkout-subtotal">৳0</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Delivery</span>
+            <span class="text-emerald-600 font-bold">FREE</span>
+          </div>
+          <div class="border-t border-dashed border-slate-100 my-2 pt-2 flex justify-between text-xs font-black text-slate-950 font-sans uppercase">
+            <span>Total Payable</span>
+            <span id="checkout-total" class="font-mono">৳0</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<%- include('partials/footer') %>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', () => {
+    const itemsPreview = document.querySelector('#checkout-items-preview');
+    const subtotalEl = document.querySelector('#checkout-subtotal');
+    const totalEl = document.querySelector('#checkout-total');
+    const checkoutForm = document.querySelector('#checkout-form');
+
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let totalPrice = 0;
+
+    // ১. কার্ট খালি থাকলে রিডাইরেক্ট করে শপে ফেরত পাঠানো
+    if (cart.length === 0) {
+      window.location.href = '/products/search';
+      return;
+    }
+
+    // ২. রাইড সাইডবার এ সমারি রেন্ডার (ইমেজ মেকানিজম আপডেট করা হয়েছে)
+    cart.forEach(item => {
+      const itemTotal = item.price * item.quantity;
+      totalPrice += itemTotal;
+
+      itemsPreview.innerHTML += `
+        <div class="py-2.5 flex items-center justify-between text-[11px] gap-2">
+          <div class="flex items-center gap-2.5 truncate">
+            <!-- [UPDATED] ছোট ইমেজ থাম্বনেইল -->
+            <div class="w-8 h-8 bg-slate-50 border border-slate-200/80 flex-shrink-0 overflow-hidden">
+              <img src="${item.image}" alt="" class="w-full h-full object-cover">
+            </div>
+            <!-- প্রোডাক্টের নাম ও কোয়ান্টিটি -->
+            <div class="truncate">
+              <span class="text-slate-800 font-sans font-bold block line-clamp-1">${item.name}</span>
+              <span class="font-mono text-[9px] text-slate-400 block mt-0.5">${item.quantity}x • ৳${item.price}</span>
+            </div>
+          </div>
+          <!-- টোটাল প্রাইস -->
+          <span class="font-mono font-bold text-slate-950 flex-shrink-0">৳${itemTotal}</span>
+        </div>
+      `;
+    });
+
+    subtotalEl.innerText = `৳${totalPrice}`;
+    totalEl.innerText = `৳${totalPrice}`;
+
+    // ৩. অর্ডার প্লেস সাবমিট হ্যান্ডলার (AJAX)
+    checkoutForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const orderData = {
+        name: document.querySelector('#cust-name').value.trim(),
+        phone: document.querySelector('#cust-phone').value.trim(),
+        email: document.querySelector('#cust-email').value.trim(),
+        address: document.querySelector('#cust-address').value.trim(),
+        items: cart,
+        totalAmount: totalPrice
+      };
+
+      try {
+        Swal.fire({
+          title: 'Processing...',
+          text: 'Placing your order to system layer.',
+          allowOutsideClick: false,
+          didOpen: () => { Swal.showLoading(); }
+        });
+
+        const response = await fetch('/api/orders/place', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(orderData)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          localStorage.removeItem('cart');
+          window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { totalItems: 0 } }));
+
+          Swal.fire({
+            title: 'Order Successful!',
+            text: 'Your package is registered for processing.',
+            icon: 'success',
+            confirmButtonColor: '#ea580c'
+          }).then(() => {
+            
+            
+            
+            window.location.href = `/order/placed/${data.orderId}`;
+            
+            
+          });
+        } else {
+          Swal.fire('Error', data.message || 'Submission failed.', 'error');
+        }
+      } catch (error) {
+        console.error(error);
+        Swal.fire('Error', 'Server environment connectivity crashed.', 'error');
+      }
+    });
+  });
+</script>

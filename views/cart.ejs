@@ -1,0 +1,188 @@
+<%- include('partials/header') %>
+<!-- SweetAlert2 CDN (অ্যালার্টের জন্য) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="w-full bg-[#f8fafc] py-8 px-4 md:px-4 min-h-[70vh]">
+  <div class="max-w-5xl mx-auto">
+    
+    <!-- Title Section -->
+    <div class="border-b-2 border-slate-950 pb-2 mb-6 flex items-baseline justify-between">
+      <h1 class="text-xl font-black text-slate-950 tracking-wider uppercase flex items-center gap-2">
+        <span class="w-1.5 h-4 bg-orange-600 block"></span> Shopping Bag
+      </h1>
+      <span id="cart-total-badge" class="text-[10px] text-slate-400 font-mono tracking-widest uppercase">0 Items</span>
+    </div>
+
+    <!-- Empty Cart View (কার্ট খালি থাকলে এটি দেখাবে) -->
+    <div id="empty-cart" class="hidden text-center py-16 bg-white border border-slate-100">
+      <i class="fa-solid fa-bag-shopping text-4xl text-slate-300 mb-3 block"></i>
+      <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Your bag is empty</h2>
+      <p class="text-xs text-slate-400 mt-1 mb-6">Add some products to get started.</p>
+      <a href="/all" class="inline-block bg-slate-950 hover:bg-orange-600 text-white font-mono font-bold text-[10px] py-2 px-6 uppercase tracking-widest transition-colors">Continue Shopping</a>
+    </div>
+
+    <!-- Cart Layout (১০০% রেসপন্সিভ গ্রিড) -->
+    <div id="cart-content" class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      
+      <!-- Left side: Items List -->
+      <div id="cart-items-list" class="lg:col-span-2 space-y-3">
+        <!-- ফ্রন্টএন্ড জাভাস্ক্রিপ্ট এখানে কার্ড আইটেম পুশ করবে -->
+      </div>
+
+      <!-- Right side: Summary & Checkout -->
+      <div class="bg-white border border-slate-100 p-4 shadow-[1px_1px_0px_rgba(0,0,0,0.05)]">
+        <h2 class="text-xs font-black text-slate-950 uppercase tracking-widest border-b border-slate-100 pb-2 mb-4">Order Summary</h2>
+        
+        <div class="space-y-2 text-xs font-mono text-slate-600">
+          <div class="flex justify-between">
+            <span>Subtotal</span>
+            <span id="summary-subtotal">৳0</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Delivery</span>
+            <span class="text-emerald-600 font-bold">FREE</span>
+          </div>
+          <div class="border-t border-dashed border-slate-100 my-2 pt-2 flex justify-between text-sm font-black text-slate-950 font-sans">
+            <span>Total Amount</span>
+            <span id="summary-total">৳0</span>
+          </div>
+        </div>
+
+        <button onclick="window.location.href='/checkout'"  id="checkout-btn" class="w-full mt-5 bg-slate-950 hover:bg-orange-600 text-white font-mono font-bold text-[11px] py-2.5 uppercase tracking-widest transition-colors duration-300">
+          Proceed to Checkout
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<%- include('partials/footer') %>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', () => {
+    const itemsContainer = document.querySelector('#cart-items-list');
+    const emptyCartView = document.querySelector('#empty-cart');
+    const cartContentView = document.querySelector('#cart-content');
+    const badgeEl = document.querySelector('#cart-total-badge');
+    
+    const subtotalEl = document.querySelector('#summary-subtotal');
+    const totalEl = document.querySelector('#summary-total');
+
+    // ১. লোকালস্টোরেজ থেকে কার্ট ডেটা রিড ও রেন্ডার করা
+    function renderCart() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      
+      // কাস্টম ইভেন্ট ফায়ার করা যাতে আপনার হেডারের sup কাউন্টারটি লাইভ আপডেট হয়
+      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+      window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { totalItems } }));
+
+      if (cart.length === 0) {
+        emptyCartView.classList.remove('hidden');
+        cartContentView.classList.add('hidden');
+        badgeEl.innerText = "0 Items";
+        return;
+      }
+
+      emptyCartView.classList.add('hidden');
+      cartContentView.classList.remove('hidden');
+      badgeEl.innerText = `${totalItems} ${totalItems > 1 ? 'Items' : 'Item'}`;
+
+      let itemsHTML = '';
+      let totalPrice = 0;
+
+      cart.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        totalPrice += itemTotal;
+
+        // মডার্ন ফ্ল্যাট স্লিম কার্ড স্ট্রাকচার
+        itemsHTML += `
+          <div class="bg-white border
+           border-slate-100 p-3 flex gap-4
+            items-center justify-between 
+            shadow-[1px_1px_1px_rgba(0,0,0,0.08)] relative group">
+            
+            <!-- Product Info -->
+            <div class="flex items-center gap-3 flex-grow">
+              <div class="w-16 h-16 bg-slate-50 border border-slate-100/60 overflow-hidden flex-shrink-0">
+                <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover">
+              </div>
+              <div>
+                <h3 class="text-xs font-bold text-slate-800 line-clamp-1">${item.name}</h3>
+                <span class="text-[11px] font-mono text-slate-400 block mt-0.5">৳${item.price}</span>
+              </div>
+            </div>
+
+            <!-- Live Action Controls (সংখ্যা কমানো, বাড়ানো এবং ডিলিট) -->
+            <div class="flex items-center gap-4 flex-shrink-0">
+              <div class="flex items-center border border-slate-200 bg-slate-50">
+                <button data-id="${item.id}" class="qty-btn btn-minus px-2 py-1 text-xs text-slate-600 font-bold hover:bg-slate-200 transition-colors">-</button>
+                <span class="px-2 text-xs font-mono font-bold text-slate-800 min-w-[20px] text-center">${item.quantity}</span>
+                <button data-id="${item.id}" class="qty-btn btn-plus px-2 py-1 text-xs text-slate-600 font-bold hover:bg-slate-200 transition-colors">+</button>
+              </div>
+              
+              <div class="text-right relative right-[20px] min-w-[70px]">
+                <span class="text-xs font-black text-slate-950 font-mono">৳${itemTotal}</span>
+              </div>
+
+              <button data-id="${item.id}" class="delete-btn
+               text-red-400 hover:text-red-600 
+               transition-colors pl-1 relative right-[28px]">
+                <i class="fa-regular fa-trash-can text-sm pointer-events-none"></i>
+              </button>
+            </div>
+
+          </div>
+        `;
+      });
+
+      itemsContainer.innerHTML = itemsHTML;
+      subtotalEl.innerText = `৳${totalPrice}`;
+      totalEl.innerText = `৳${totalPrice}`;
+    }
+
+    // ২. ইভেন্ট ডেলিগেশন দিয়ে লাইভ সংখ্যা চেঞ্জ এবং ডিলিট করা
+    document.body.addEventListener('click', (e) => {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const target = e.target;
+      
+      // প্লাস বাটন চাপলে
+      if (target.classList.contains('btn-plus')) {
+        const id = target.dataset.id;
+        const item = cart.find(i => i.id === id);
+        if (item) item.quantity++;
+        localStorage.setItem('cart', JSON.stringify(cart));
+        renderCart();
+      }
+      
+      // মাইনাস বাটন চাপলে
+      if (target.classList.contains('btn-minus')) {
+        const id = target.dataset.id;
+        const item = cart.find(i => i.id === id);
+        if (item && item.quantity > 1) {
+          item.quantity--;
+        } else if (item && item.quantity === 1) {
+          // ১ থাকা অবস্থায় মাইনাস চাপলে লিস্ট থেকে ডিলিট হয়ে যাবে
+          cart = cart.filter(i => i.id !== id);
+        }
+        localStorage.setItem('cart', JSON.stringify(cart));
+        renderCart();
+      }
+
+      // ট্র্যাশ/ডিলিট বাটন চাপলে
+      if (target.classList.contains('delete-btn')) {
+        const id = target.dataset.id;
+        cart = cart.filter(i => i.id !== id);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        renderCart();
+      }
+    });
+
+    // ৩. চেকআউট বাটন অ্যাকশন (SweetAlert সহ)
+
+
+    // প্রথমবার পেজ ওপেন হলে রান হবে
+    renderCart();
+  });
+</script>

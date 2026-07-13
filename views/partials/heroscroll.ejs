@@ -1,0 +1,100 @@
+<div class="w-full bg-slate-900 overflow-hidden relative">
+  <!-- Scrollable Viewport Wrapper -->
+  <div class="flex overflow-x-auto snap-x snap-mandatory no-scrollbar" id="hero-scroller">
+    
+    <!-- Slide 1 -->
+    <div class="w-full shrink-0 aspect-[16/9] md:aspect-[21/9] relative snap-center group">
+      <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+           src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80" 
+           alt="New Arrivals Collection">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end p-8 md:p-16">
+        <span class="text-orange-500 text-xs md:text-sm font-bold uppercase tracking-widest mb-2">New Collection</span>
+        <h3 class="text-white font-extrabold text-2xl md:text-4xl max-w-xl leading-tight">Trending Apparel & Custom Prints</h3>
+      </div>
+    </div>
+
+    <!-- Slide 2 -->
+    <div class="w-full shrink-0 aspect-[16/9] md:aspect-[21/9] relative snap-center group">
+      <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+           src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1600&q=80" 
+           alt="Exclusive Gadgets">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end p-8 md:p-16">
+        <span class="text-orange-500 text-xs md:text-sm font-bold uppercase tracking-widest mb-2">Hot Gadgets</span>
+        <h3 class="text-white font-extrabold text-2xl md:text-4xl max-w-xl leading-tight">Premium High-Quality Electronics</h3>
+      </div>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="w-full shrink-0 aspect-[16/9] md:aspect-[21/9] relative snap-center group">
+      <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+           src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1600&q=80" 
+           alt="Mega Discount Deals">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end p-8 md:p-16">
+        <span class="text-orange-500 text-xs md:text-sm font-bold uppercase tracking-widest mb-2">Big Sale</span>
+        <h3 class="text-white font-extrabold text-2xl md:text-4xl max-w-xl leading-tight">Up to 50% Off On Everything</h3>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  /* Hides the browser scrollbar track */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+
+<script type="text/javascript">
+  const scroller = document.querySelector("#hero-scroller");
+  
+  // প্রথম স্লাইডটিকে কপি (Clone) করে একদম শেষে যোগ করছি নিরবিচ্ছিন্ন লুপের জন্য
+  const firstSlide = scroller.children[0].cloneNode(true);
+  scroller.appendChild(firstSlide);
+
+  let scrollInterval;
+  let isTransitioning = false;
+
+  function startAutoScroll() {
+    scrollInterval = setInterval(() => {
+      if (isTransitioning) return;
+
+      const slideWidth = scroller.clientWidth;
+      
+      // স্ক্রল অ্যানিমেশন অন করা হচ্ছে
+      scroller.style.scrollBehavior = "smooth";
+      scroller.scrollBy({ left: slideWidth });
+
+    }, 3000); // প্রতি ৪ সেকেন্ড পর পর পরের স্লাইডে যাবে
+  }
+
+  function stopAutoScroll() {
+    clearInterval(scrollInterval);
+  }
+
+  // স্ক্রল পজিশন ট্র্যাক করার জন্য লিসেনার
+  scroller.addEventListener("scroll", () => {
+    const slideWidth = scroller.clientWidth;
+    const currentScroll = scroller.scrollLeft;
+    
+    // আসল স্লাইড সংখ্যা (৩টি) পার হয়ে যখন ক্লোন স্লাইডে পৌঁছাবে
+    // ৩টি স্লাইড মানে টোটাল স্ক্রল width হবে ৩ * slideWidth
+    if (currentScroll >= slideWidth * 3) {
+      isTransitioning = true;
+      
+      // চোখের পলকে কোনো অ্যানিমেশন ছাড়া স্ক্রল পজিশন একদম শুরুতে (০) নিয়ে যাওয়া
+      scroller.style.scrollBehavior = "auto";
+      scroller.scrollLeft = 0;
+      
+      isTransitioning = false;
+    }
+  });
+
+  // মাউস বা টাচ ইনপুট কন্ট্রোল
+  scroller.addEventListener("mouseenter", stopAutoScroll);
+  scroller.addEventListener("mouseleave", startAutoScroll);
+  scroller.addEventListener("touchstart", stopAutoScroll);
+  scroller.addEventListener("touchend", startAutoScroll);
+
+  // ইনিশিয়াল স্টার্ট
+  startAutoScroll();
+</script>

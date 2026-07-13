@@ -1,0 +1,198 @@
+<%- include('partials/header') %>
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="w-full bg-[#f8fafc] py-8 px-2 md:px-4 min-h-[80vh]">
+  <div class="max-w-7xl mx-auto">
+    
+    <!-- Title Section -->
+    <div class="border-b-2 border-slate-950 pb-2 mb-6 flex items-baseline justify-between">
+      <h1 class="text-xl font-black text-slate-950 tracking-wider uppercase flex items-center gap-2">
+        <span class="w-1.5 h-4 bg-orange-600 block"></span> Discover Goods
+      </h1>
+      <span id="result-count" class="text-[9px] text-slate-400 font-mono tracking-widest uppercase">Loading Inventory...</span>
+    </div>
+
+    <!-- Search Controls -->
+    <div class="bg-white border border-slate-100 p-4 mb-6 shadow-[1px_1px_0px_rgba(0,0,0,0.03)] grid grid-cols-1 sm:grid-cols-3 gap-3">
+      
+      <!-- Input Search Field -->
+      <div class="sm:col-span-2 relative">
+        <input 
+          type="text" 
+          id="search-input" 
+          placeholder="Type product name..." 
+          disabled
+          class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs font-mono py-2.5 pl-3 pr-10 focus:outline-none focus:border-slate-950 transition-colors disabled:opacity-50"
+        >
+        <span class="absolute right-3 top-2.5 text-slate-400"><i class="fa-solid fa-magnifying-glass text-xs"></i></span>
+      </div>
+
+      <!-- Dynamic Category Dropdown Filter -->
+      <div>
+        <select 
+          id="category-filter" 
+          disabled
+          class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-mono py-2.5 px-3 focus:outline-none focus:border-slate-950 transition-colors cursor-pointer disabled:opacity-50"
+        >
+          <option value="">All Categories</option>
+          <!-- ডাটাবেজের ক্যাটাগরিগুলো জাভাস্ক্রিপ্ট দিয়ে এখানে ডাইনামিকালি ঢুকবে -->
+        </select>
+      </div>
+
+    </div>
+
+    <!-- State Views: Loading / Not Found -->
+    <div id="search-status" class="text-center py-12 bg-white border border-slate-100 mb-6">
+      <div id="status-spinner" class="w-5 h-5 border-2 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+      <p id="status-text" class="text-xs font-mono text-slate-400 uppercase tracking-wider mt-2">Connecting to store...</p>
+    </div>
+
+    <!-- Dynamic Product Grid -->
+    <div id="search-results-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3"></div>
+
+  </div>
+</div>
+
+<%- include('partials/footer') %>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.querySelector('#search-input');
+    const categoryFilter = document.querySelector('#category-filter');
+    const resultsGrid = document.querySelector('#search-results-grid');
+    const resultCount = document.querySelector('#result-count');
+    const statusDiv = document.querySelector('#search-status');
+    const statusSpinner = document.querySelector('#status-spinner');
+    const statusText = document.querySelector('#status-text');
+
+    let allProducts = [];
+
+    // ১. ডাটা লোড এবং ডাইনামিক ক্যাটাগরি জেনারেট করা
+    async function initInventory() {
+      try {
+        const response = await fetch('/products/api/all-raw');
+        allProducts = await response.json();
+
+        // ডাইনামিক ক্যাটাগরি লিস্ট তৈরি (Set ব্যবহার করে ইউনিক ক্যাটাগরি ফিল্টার করা হয়েছে)
+        const uniqueCategories = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
+        
+        // অ্যালফাবেট অনুযায়ী সাজানো (A-Z)
+        uniqueCategories.sort();
+
+        // ড্রপডাউনে অপশনগুলো পুশ করা
+        uniqueCategories.forEach(category => {
+          const option = document.createElement('option');
+          option.value = category;
+          option.textContent = category;
+          categoryFilter.appendChild(option);
+        });
+
+        // লোডিং শেষ, ইনপুট ফিল্ড একটিভ
+        searchInput.removeAttribute('disabled');
+        categoryFilter.removeAttribute('disabled');
+        
+        statusDiv.classList.add('hidden');
+        resultCount.innerText = "Ready to Search";
+      } catch (err) {
+        console.error(err);
+        statusSpinner.classList.add('hidden');
+        statusText.innerText = "⚠️ Failed to load store inventory.";
+      }
+    }
+
+    // ২. ক্লায়েন্ট সাইড ফিল্টারিং লজিক
+    function filterProducts() {
+      const query = searchInput.value.trim().toLowerCase();
+      const selectedCategory = categoryFilter.value;
+
+      if (!query && !selectedCategory) {
+        resultsGrid.innerHTML = '';
+        resultCount.innerText = "Ready to Search";
+        statusDiv.classList.add('hidden');
+        return;
+      }
+
+      const filtered = allProducts.filter(product => {
+        const matchesName = product.name.toLowerCase().includes(query);
+        const matchesCategory = selectedCategory === '' || product.category === selectedCategory;
+        return matchesName && matchesCategory;
+      });
+
+      if (filtered.length === 0) {
+        statusDiv.classList.remove('hidden');
+        statusSpinner.classList.add('hidden');
+        statusText.innerText = "❌ No Products Found";
+        resultCount.innerText = "0 Found";
+        resultsGrid.innerHTML = '';
+        return;
+      }
+
+      statusDiv.classList.add('hidden');
+      resultCount.innerText = `${filtered.length} ${filtered.length > 1 ? 'Matches' : 'Match'}`;
+
+      resultsGrid.innerHTML = filtered.map(p => {
+        const orig = p.price || 250, cur = p.isDiscount && p.discountPrice ? p.discountPrice : orig;
+        const pct = (p.isDiscount && orig > cur) ? Math.round(((orig - cur) / orig) * 100) : 0;
+        
+        return `
+          <div class="bg-white flex flex-col justify-between group hover:-translate-y-1 hover:shadow-md transition-all duration-300 relative border border-slate-100">
+            <a href="/products/details/${p._id}" class="block aspect-square bg-slate-50 overflow-hidden relative border-b border-slate-100/60">
+              <img class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" src="${p.images[0]}" alt="${p.name}">
+              ${p.isNewArrival ? `<span class="absolute top-2 left-2 bg-slate-950 text-white font-mono text-[8px] font-bold uppercase px-1.5 py-0.5 tracking-wider">New</span>` : ''}
+              ${pct ? `<span class="absolute top-2 right-2 bg-red-600 text-white font-mono text-[8px] font-bold uppercase px-1.5 py-0.5 tracking-wider">-${pct}%</span>` : ''}
+            </a>
+            <div class="p-3 flex-grow flex flex-col justify-between">
+              <div>
+                <span class="text-[9px] text-slate-400 font-mono uppercase tracking-widest block mb-0.5">${p.category}</span>
+                <a href="/products/details/${p._id}">
+                  <h3 class="text-xs font-bold text-slate-800 line-clamp-1 group-hover:text-orange-600 transition-colors duration-200 leading-tight">${p.name}</h3>
+                </a>
+              </div>
+              <div class="mt-0 pt-2 border-t border-dashed border-slate-100">
+                <div class="flex items-baseline gap-1.5 mb-2">
+                  <span class="text-xs font-black text-slate-950 tracking-tight">৳${cur}</span>
+                  ${pct ? `<span class="text-[9px] text-slate-400 line-through">৳${orig}</span>` : ''}
+                </div>
+                <button data-id="${p._id}" data-name="${p.name}" data-price="${cur}" data-image="${p.images[0]}" class="add-btn w-full bg-slate-950 group-hover:bg-orange-600 text-white font-mono font-bold text-[9px] py-2 uppercase tracking-widest transition-colors duration-300">
+                  + Add To Cart
+                </button>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    searchInput.addEventListener('input', filterProducts);
+    categoryFilter.addEventListener('change', filterProducts);
+
+    // কার্ট লজিক
+    resultsGrid.addEventListener('click', e => {
+      if (!e.target.classList.contains('add-btn')) return;
+      const b = e.target;
+      const prod = { id: b.dataset.id, name: b.dataset.name, price: parseFloat(b.dataset.price), image: b.dataset.image, quantity: 1 };
+      
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const exist = cart.find(i => i.id === prod.id);
+      exist ? exist.quantity++ : cart.push(prod);
+      localStorage.setItem('cart', JSON.stringify(cart));
+
+      window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { totalItems: cart.reduce((s, i) => s + i.quantity, 0) } }));
+
+      Swal.fire({
+        title: 'Added to Cart',
+        text: prod.name,
+        icon: 'success',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 1500,
+        background: '#0f172a',
+        color: '#fff',
+        iconColor: '#ea580c'
+      });
+    });
+
+    initInventory();
+  });
+</script>

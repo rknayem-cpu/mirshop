@@ -1,0 +1,198 @@
+<%- include('partials/header') %>
+<!-- SweetAlert2 CDN (কনফার্মেশন ও ডিলিট সাকসেস নোটিশের জন্য) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="w-full bg-[#f8fafc] py-8 px-2 md:px-4 min-h-[80vh]">
+  <div class="max-w-6xl mx-auto">
+    
+    <!-- Title Section -->
+    <div class="border-b-2 border-slate-950 pb-2 mb-6 flex items-baseline justify-between">
+      <h1 class="text-xl font-black text-slate-950 tracking-wider uppercase flex items-center gap-2">
+        <span class="w-1.5 h-4 bg-red-600 block"></span> Inventory Deletion Panel
+      </h1>
+      <span id="inventory-count" class="text-[9px] text-slate-400 font-mono tracking-widest uppercase">Loading Inventory...</span>
+    </div>
+
+    <!-- Live Search Input Box -->
+    <div class="bg-white border border-slate-100 p-4 mb-6 shadow-[1px_1px_0px_rgba(0,0,0,0.03)]">
+      <div class="relative">
+        <input 
+          type="text" 
+          id="delete-search-input" 
+          placeholder="Search product by name to wipe out..." 
+          disabled
+          class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs font-mono py-2.5 pl-3 pr-10 focus:outline-none focus:border-red-600 transition-colors disabled:opacity-50"
+        >
+        <span class="absolute right-3 top-2.5 text-slate-400"><i class="fa-solid fa-trash-can text-xs"></i></span>
+      </div>
+    </div>
+
+    <!-- State Views: Loading / Error / Not Found -->
+    <div id="status-panel" class="text-center py-12 bg-white border border-slate-100 mb-6">
+      <div id="status-spinner" class="w-5 h-5 border-2 border-red-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+      <p id="status-text" class="text-xs font-mono text-slate-400 uppercase tracking-wider mt-2">Fetching live database...</p>
+    </div>
+
+    <!-- Inventory Output List (ক্লিন টেবিল লেআউট সার্চের জন্য বেস্ট) -->
+    <div id="table-wrapper" class="bg-white border border-slate-100 shadow-[1px_1px_0px_rgba(0,0,0,0.02)] hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-700 font-mono">
+          <thead>
+            <tr class="border-b border-slate-950 text-slate-400 uppercase text-[9px] tracking-wider bg-slate-50">
+              <th class="p-3 font-bold">Product Details</th>
+              <th class="p-3 font-bold">Category</th>
+              <th class="p-3 font-bold">Price</th>
+              <th class="p-3 font-bold text-center">Operation</th>
+            </tr>
+          </thead>
+          <tbody id="inventory-rows" class="divide-y divide-slate-100">
+            <!-- সার্চ রেজাল্ট জাভাস্ক্রিপ্ট দিয়ে এখানে ইনজেক্ট হবে -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<%- include('partials/footer') %>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.querySelector('#delete-search-input');
+    const inventoryCount = document.querySelector('#inventory-count');
+    const statusPanel = document.querySelector('#status-panel');
+    const statusSpinner = document.querySelector('#status-spinner');
+    const statusText = document.querySelector('#status-text');
+    const tableWrapper = document.querySelector('#table-wrapper');
+    const inventoryRows = document.querySelector('#inventory-rows');
+
+    let allProducts = [];
+
+    // ১. ডাটাবেজ থেকে ইনভেন্টরি পুল করা (আপনার বানানো raw এপিআই ব্যবহার করা হয়েছে)
+    async function fetchInventory() {
+      try {
+        const response = await fetch('/products/api/all-raw');
+        allProducts = await response.json();
+
+        searchInput.removeAttribute('disabled');
+        renderRows(allProducts);
+      } catch (err) {
+        console.error(err);
+        statusSpinner.classList.add('hidden');
+        statusText.innerText = "⚠️ Failed to sync with database.";
+      }
+    }
+
+    // ২. টেবিল রো রেন্ডার ও আপডেট ফাংশন
+    function renderRows(productsList) {
+      if (productsList.length === 0) {
+        tableWrapper.classList.add('hidden');
+        statusPanel.classList.remove('hidden');
+        statusSpinner.classList.add('hidden');
+        statusText.innerText = searchInput.value ? "❌ No Matching Products Found" : "Empty Catalogue";
+        inventoryCount.innerText = "0 Items";
+        return;
+      }
+
+      statusPanel.classList.add('hidden');
+      tableWrapper.classList.remove('hidden');
+      inventoryCount.innerText = `${productsList.length} Items Indexed`;
+
+      inventoryRows.innerHTML = productsList.map(p => {
+        return `
+          <tr id="row-${p._id}" class="hover:bg-slate-50/80 transition-colors">
+            <td class="p-3 font-sans font-bold text-slate-900 flex items-center gap-3">
+              <img src="${p.images[0]}" alt="" class="w-8 h-8 object-cover border border-slate-200 bg-slate-50">
+              <div>
+                <span class="block text-xs leading-tight">${p.name}</span>
+                <span class="font-mono text-[9px] text-slate-400 block mt-0.5">ID: ${p._id}</span>
+              </div>
+            </td>
+            <td class="p-3 text-slate-500 text-[11px] uppercase">${p.category}</td>
+            <td class="p-3 text-slate-950 font-bold font-mono">৳${p.isDiscount ? p.discountPrice : p.price}</td>
+            <td class="p-3 text-center">
+              <button 
+                data-id="${p._id}" 
+                data-name="${p.name}" 
+                class="delete-trigger bg-red-50 hover:bg-red-600 text-red-600 hover:text-white font-mono text-[9px] font-bold px-3 py-1.5 uppercase tracking-wider transition-colors duration-200"
+              >
+                <i class="fa-solid fa-trash-can mr-1"></i> Delete
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ৩. লাইভ সার্চ ফিল্টারিং
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.trim().toLowerCase();
+      const filtered = allProducts.filter(p => p.name.toLowerCase().includes(query));
+      renderRows(filtered);
+    });
+
+    // ৪. ইভেন্ট ডেলিগেশন দিয়ে ডিলিট অপারেশন হ্যান্ডেল করা
+    inventoryRows.addEventListener('click', async (e) => {
+      const btn = e.target.closest('.delete-trigger');
+      if (!btn) return;
+
+      const id = btn.dataset.id;
+      const name = btn.dataset.name;
+
+      // সুইট অ্যালার্ট দিয়ে কনফার্মেশন প্রম্পট
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: `"${name}" will be permanently removed from store.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#0f172a',
+        confirmButtonText: 'WIPE OUT',
+        background: '#fff',
+        color: '#0f172a'
+      });
+
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`/products/api/delete/${id}`, { method: 'DELETE' });
+          const data = await response.json();
+
+          if (data.success) {
+            // ১. লোকাল অ্যারে থেকে ডেটা রিমুভ করা
+            allProducts = allProducts.filter(p => p._id !== id);
+            
+            // ২. ডোম (DOM) থেকে রো রিমুভ করে দেওয়া
+            document.getElementById(`row-${id}`).remove();
+            
+            // ৩. টেবিলের কাউন্ট আপডেট করা
+            const currentQuery = searchInput.value.trim().toLowerCase();
+            const currentFiltered = allProducts.filter(p => p.name.toLowerCase().includes(currentQuery));
+            renderRows(currentFiltered);
+
+            // সাকসেস টোস্ট নোটিফিকেশন
+            Swal.fire({
+              title: 'Deleted!',
+              text: 'Product successfully vaporized.',
+              icon: 'success',
+              toast: true,
+              position: 'top-end',
+              showConfirmButton: false,
+              timer: 2000,
+              background: '#0f172a',
+              color: '#fff',
+              iconColor: '#dc2626'
+            });
+          } else {
+            Swal.fire('Failed', data.message || 'Error occurred', 'error');
+          }
+        } catch (error) {
+          console.error(error);
+          Swal.fire('Error', 'Network error or server crash.', 'error');
+        }
+      }
+    });
+
+    fetchInventory();
+  });
+</script>

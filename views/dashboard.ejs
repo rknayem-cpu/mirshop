@@ -1,0 +1,67 @@
+<%- include('partials/header') %>
+
+<div class="w-full bg-[#f8fafc] py-6 px-4 font-sans text-slate-900">
+  <div class="max-w-4xl mx-auto">
+
+    <!-- 🏷️ ড্যাশবোর্ড হেডিং -->
+    <div class="border-b border-slate-300 pb-2 mb-6">
+      <h1 class="text-base font-bold uppercase text-slate-900">Admin Dashboard</h1>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      
+      <!-- 🛠️ বাম পাশের টুলস ও মেনু লিংক -->
+      <div class="md:col-span-1 bg-white border border-slate-200 rounded p-4 shadow-sm space-y-3">
+        <p class="text-[10px] font-mono uppercase text-slate-400 tracking-wider">Dashboard Tools</p>
+        
+        <!-- Add Post Tool -->
+        <a href="/addproduct" class="flex items-center gap-2 text-xs font-bold uppercase text-slate-700 hover:text-orange-600 transition-colors py-1">
+          <i class="fa-solid fa-circle-plus text-sm"></i> Add Post / Product
+        </a>
+
+        <!-- Shop View Link -->
+        <a href="/all" class="flex items-center gap-2 text-xs font-bold uppercase text-slate-700 hover:text-orange-600 transition-colors py-1">
+          <i class="fa-solid fa-store text-sm"></i> View Shop
+        </a>
+
+        <hr class="border-slate-100 my-2">
+
+        <!-- Logout Button -->
+        <a href="/logout" class="flex items-center gap-2 text-xs font-bold uppercase text-red-600 hover:text-red-700 transition-colors py-1">
+          <i class="fa-solid fa-right-from-bracket text-sm"></i> Logout
+        </a>
+      </div>
+
+      <!-- 📊 ডান পাশের আলাদা আলাদা লিংক ও ডাটা ডিভ -->
+      <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 h-fit">
+        
+        <!-- 🔗 Orders Counter Link -->
+        <a href="/admin/orders" class="block bg-slate-900 text-white rounded p-4 shadow hover:bg-orange-600 transition-all">
+          <div class="flex flex-col justify-between min-h-[80px]">
+            <span class="text-[10px] font-mono text-slate-300 uppercase tracking-wide">Total Orders</span>
+            <div class="text-3xl font-black font-mono mt-1">
+              <%= typeof orders !== 'undefined' ? orders.length : 0 %>
+            </div>
+            <span class="text-[9px] font-mono text-slate-400 mt-2 block group-hover:text-white">// View Orders &rarr;</span>
+          </div>
+        </a>
+
+        <!-- 🔗 Posts Counter Link -->
+        <a href="/admin/manage" class="block bg-slate-900 text-white rounded p-4 shadow hover:bg-orange-600 transition-all">
+          <div class="flex flex-col justify-between min-h-[80px]">
+            <span class="text-[10px] font-mono text-slate-300 uppercase tracking-wide">Live Posts / Inventory</span>
+            <div class="text-3xl font-black font-mono mt-1">
+              <%= typeof products !== 'undefined' ? products.length : 0 %>
+            </div>
+            <span class="text-[9px] font-mono text-slate-400 mt-2 block group-hover:text-white">// View Products &rarr;</span>
+          </div>
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<%- include('partials/footer') %>
