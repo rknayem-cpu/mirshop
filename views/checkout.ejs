@@ -73,7 +73,7 @@
           </div>
           <div class="flex justify-between">
             <span>Delivery</span>
-            <span class="text-emerald-600 font-bold">FREE</span>
+            <span class="text-emerald-600 font-bold">100</span>
           </div>
           <div class="border-t border-dashed border-slate-100 my-2 pt-2 flex justify-between text-xs font-black text-slate-950 font-sans uppercase">
             <span>Total Payable</span>
@@ -104,7 +104,7 @@
       window.location.href = '/products/search';
       return;
     }
-
+ let delivery = 100
     // ২. রাইড সাইডবার এ সমারি রেন্ডার (ইমেজ মেকানিজম আপডেট করা হয়েছে)
     cart.forEach(item => {
       const itemTotal = item.price * item.quantity;
@@ -130,7 +130,7 @@
     });
 
     subtotalEl.innerText = `৳${totalPrice}`;
-    totalEl.innerText = `৳${totalPrice}`;
+    totalEl.innerText = `৳${totalPrice + delivery}`;
 
     // ৩. অর্ডার প্লেস সাবমিট হ্যান্ডলার (AJAX)
     checkoutForm.addEventListener('submit', async (e) => {
@@ -142,7 +142,7 @@
         email: document.querySelector('#cust-email').value.trim(),
         address: document.querySelector('#cust-address').value.trim(),
         items: cart,
-        totalAmount: totalPrice
+        totalAmount: totalPrice + delivery
       };
 
       try {

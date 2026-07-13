@@ -63,9 +63,14 @@
             <span class="font-sans font-bold text-slate-900 truncate max-w-[240px]">
               <%= item.name %> <span class="text-slate-400 font-mono text-[10px]">×<%= item.quantity %></span>
             </span>
-            <span class="font-mono text-slate-700">৳<%= item.price * item.quantity %></span>
+            <span class="font-mono text-slate-700 text-xl">৳<%= item.price * item.quantity %></span>
           </div>
         <% }) %>
+
+        <div class="w-full flex justify-between"> <span class="font-mono text-slate-700">delivery charge</span>
+          <span class="font-mono text-slate-700">100</span>
+</div>
+
       </div>
 
       <!-- Total Amount Node -->

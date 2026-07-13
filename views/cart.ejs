@@ -40,7 +40,7 @@
           </div>
           <div class="flex justify-between">
             <span>Delivery</span>
-            <span class="text-emerald-600 font-bold">FREE</span>
+            <span class="text-emerald-600 font-bold">100</span>
           </div>
           <div class="border-t border-dashed border-slate-100 my-2 pt-2 flex justify-between text-sm font-black text-slate-950 font-sans">
             <span>Total Amount</span>
@@ -91,7 +91,7 @@
 
       let itemsHTML = '';
       let totalPrice = 0;
-
+      let delivery = 100
       cart.forEach(item => {
         const itemTotal = item.price * item.quantity;
         totalPrice += itemTotal;
@@ -109,8 +109,10 @@
                 <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover">
               </div>
               <div>
-                <h3 class="text-xs font-bold text-slate-800 line-clamp-1">${item.name}</h3>
-                <span class="text-[11px] font-mono text-slate-400 block mt-0.5">৳${item.price}</span>
+<h3 class="text-xs font-bold text-slate-800 line-clamp-1 cursor-pointer hover:underline" 
+    onclick="window.location.href='/products/details/${item.id}'">
+    ${item.name}
+</h3>                <span class="text-[11px] font-mono text-slate-400 block mt-0.5">৳${item.price}</span>
               </div>
             </div>
 
@@ -139,7 +141,7 @@
 
       itemsContainer.innerHTML = itemsHTML;
       subtotalEl.innerText = `৳${totalPrice}`;
-      totalEl.innerText = `৳${totalPrice}`;
+      totalEl.innerText = `৳${totalPrice+delivery}`;
     }
 
     // ২. ইভেন্ট ডেলিগেশন দিয়ে লাইভ সংখ্যা চেঞ্জ এবং ডিলিট করা
