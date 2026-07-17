@@ -1,66 +1,204 @@
 <%- include('partials/header') %>
 
-<div class="w-full bg-[#f8fafc] py-6 px-4 font-sans text-slate-900">
-  <div class="max-w-4xl mx-auto">
-
-    <!-- 🏷️ ড্যাশবোর্ড হেডিং -->
-    <div class="border-b border-slate-300 pb-2 mb-6">
-      <h1 class="text-base font-bold uppercase text-slate-900">Admin Dashboard</h1>
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/30 py-8 px-4">
+  
+  
+  <div class="max-w-6xl mx-auto">
+    
+    <!-- Header with Gradient -->
+    <div class="relative mb-10">
+      <div class="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-orange-500/10 blur-3xl"></div>
+      <div class="relative flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <div class="flex items-center gap-3 mb-1">
+            <div class="w-1 h-8 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></div>
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Admin Dashboard</h1>
+            <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-mono font-bold">LIVE</span>
+          </div>
+          <p class="text-sm text-slate-500 ml-4">Manage your store, orders, and inventory from one place</p>
+        </div>
+        <div class="flex items-center gap-2 text-xs text-slate-400 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="font-mono">System Online</span>
+        </div>
+      </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
       
-      <!-- 🛠️ বাম পাশের টুলস ও মেনু লিংক -->
-      <div class="md:col-span-1 bg-white border border-slate-200 rounded p-4 shadow-sm space-y-3">
-        <p class="text-[10px] font-mono uppercase text-slate-400 tracking-wider">Dashboard Tools</p>
-        
-        <!-- Add Post Tool -->
-        <a href="/addproduct" class="flex items-center gap-2 text-xs font-bold uppercase text-slate-700 hover:text-orange-600 transition-colors py-1">
-          <i class="fa-solid fa-circle-plus text-sm"></i> Add Post / Product
-        </a>
-
-        <!-- Shop View Link -->
-        <a href="/all" class="flex items-center gap-2 text-xs font-bold uppercase text-slate-700 hover:text-orange-600 transition-colors py-1">
-          <i class="fa-solid fa-store text-sm"></i> View Shop
-        </a>
-
-        <hr class="border-slate-100 my-2">
-
-        <!-- Logout Button -->
-        <a href="/logout" class="flex items-center gap-2 text-xs font-bold uppercase text-red-600 hover:text-red-700 transition-colors py-1">
-          <i class="fa-solid fa-right-from-bracket text-sm"></i> Logout
-        </a>
-      </div>
-
-      <!-- 📊 ডান পাশের আলাদা আলাদা লিংক ও ডাটা ডিভ -->
-      <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 h-fit">
-        
-        <!-- 🔗 Orders Counter Link -->
-        <a href="/admin/orders" class="block bg-slate-900 text-white rounded p-4 shadow hover:bg-orange-600 transition-all">
-          <div class="flex flex-col justify-between min-h-[80px]">
-            <span class="text-[10px] font-mono text-slate-300 uppercase tracking-wide">Total Orders</span>
-            <div class="text-3xl font-black font-mono mt-1">
-              <%= typeof orders !== 'undefined' ? orders.length : 0 %>
-            </div>
-            <span class="text-[9px] font-mono text-slate-400 mt-2 block group-hover:text-white">// View Orders &rarr;</span>
+      <!-- Left Sidebar - Tools -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300">
+          <div class="flex items-center gap-2 mb-5">
+            <i class="fa-solid fa-sliders-h text-orange-500 text-sm"></i>
+            <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">Quick Tools</span>
           </div>
-        </a>
-
-        <!-- 🔗 Posts Counter Link -->
-        <a href="/admin/manage" class="block bg-slate-900 text-white rounded p-4 shadow hover:bg-orange-600 transition-all">
-          <div class="flex flex-col justify-between min-h-[80px]">
-            <span class="text-[10px] font-mono text-slate-300 uppercase tracking-wide">Live Posts / Inventory</span>
-            <div class="text-3xl font-black font-mono mt-1">
-              <%= typeof products !== 'undefined' ? products.length : 0 %>
-            </div>
-            <span class="text-[9px] font-mono text-slate-400 mt-2 block group-hover:text-white">// View Products &rarr;</span>
+          
+          <div class="space-y-2">
+            <a href="/add" 
+               class="flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-orange-50 to-orange-100/50 hover:from-orange-100 hover:to-orange-200/50 text-slate-700 hover:text-orange-600 transition-all duration-300 group">
+              <div class="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-plus text-sm"></i>
+              </div>
+              <div>
+                <p class="text-sm font-bold">Add Product</p>
+                <p class="text-[10px] text-slate-400">New inventory item</p>
+              </div>
+              <i class="fa-solid fa-arrow-right ml-auto text-xs text-slate-300 group-hover:text-orange-500 group-hover:translate-x-1 transition-all"></i>
+            </a>
+            
+            <a href="/all" 
+               class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-blue-600 transition-all duration-300 group">
+              <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-store text-sm"></i>
+              </div>
+              <div>
+                <p class="text-sm font-bold">View Shop</p>
+                <p class="text-[10px] text-slate-400">Customer facing store</p>
+              </div>
+              <i class="fa-solid fa-arrow-right ml-auto text-xs text-slate-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all"></i>
+            </a>
           </div>
-        </a>
-
+          
+          <hr class="border-slate-200 my-4">
+          
+          <a href="/logout" 
+             class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-slate-600 hover:text-red-600 transition-all duration-300 group">
+            <div class="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-right-from-bracket text-sm"></i>
+            </div>
+            <div>
+              <p class="text-sm font-bold">Logout</p>
+              <p class="text-[10px] text-slate-400">End session</p>
+            </div>
+            <i class="fa-solid fa-arrow-right ml-auto text-xs text-slate-300 group-hover:text-red-500 group-hover:translate-x-1 transition-all"></i>
+          </a>
+        </div>
+        
+        <!-- Quick Stats Mini -->
+        <div class="mt-4 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-5 text-white shadow-lg shadow-orange-500/20">
+          <p class="text-[10px] font-mono opacity-80 uppercase tracking-wider">Welcome Back</p>
+          <p class="text-lg font-bold mt-1">Admin</p>
+          <p class="text-xs opacity-80 mt-2">
+            <i class="fa-regular fa-clock mr-1"></i> 
+            <%= new Date().toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+          </p>
+        </div>
       </div>
-
+      
+      <!-- Right Side - Stats Cards -->
+      <div class="lg:col-span-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          
+          <!-- Orders Card -->
+          <a href="/admin/orders" 
+             class="group relative overflow-hidden bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:border-orange-300 transition-all duration-500">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 rounded-full blur-2xl group-hover:bg-orange-500/10 transition-all"></div>
+            <div class="absolute -bottom-12 -right-12 w-32 h-32 bg-orange-500/5 rounded-full blur-2xl group-hover:bg-orange-500/10 transition-all"></div>
+            
+            <div class="relative flex items-start justify-between">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Total Orders</span>
+                  <span class="text-[8px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded font-mono font-bold"></span>
+                </div>
+                <div class="text-4xl font-black text-slate-900 mt-2">
+                  <%= typeof orders !== 'undefined' ? orders.length : 0 %>
+                </div>
+                <div class="flex items-center gap-1 mt-3 text-xs text-orange-600 font-medium">
+                  <span>View all orders</span>
+                  <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform text-xs"></i>
+                </div>
+              </div>
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center text-orange-500 text-2xl group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-box"></i>
+              </div>
+            </div>
+            
+            <div class="relative mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+              <span><i class="fa-regular fa-clock mr-1"></i> Last 30 days</span>
+              <span class="flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                Active
+              </span>
+            </div>
+          </a>
+          
+          <!-- Products Card -->
+          <a href="/admin/manage" 
+             class="group relative overflow-hidden bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:border-blue-300 transition-all duration-500">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-all"></div>
+            <div class="absolute -bottom-12 -right-12 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-all"></div>
+            
+            <div class="relative flex items-start justify-between">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Live Products</span>
+                  <span class="text-[8px] bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded font-mono font-bold">In Stock</span>
+                </div>
+                <div class="text-4xl font-black text-slate-900 mt-2">
+                  <%= typeof products !== 'undefined' ? products.length : 0 %>
+                </div>
+                <div class="flex items-center gap-1 mt-3 text-xs text-blue-600 font-medium">
+                  <span>Manage inventory</span>
+                  <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform text-xs"></i>
+                </div>
+              </div>
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-500 text-2xl group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-cubes"></i>
+              </div>
+            </div>
+            
+            <div class="relative mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+              <span><i class="fa-regular fa-calendar mr-1"></i> Updated today</span>
+              <span class="flex items-center gap-1">
+                <i class="fa-regular fa-eye"></i> 
+              </span>
+            </div>
+          </a>
+          
+        </div>
+        
+        <!-- Recent Activity / Quick Actions -->
+        <div class="mt-5 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <i class="fa-regular fa-bell text-slate-400"></i>
+              <span class="text-xs font-bold text-slate-600">Quick Actions</span>
+            </div>
+            <span class="text-[9px] text-slate-400 font-mono">⚡ Instant</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <a href="/add" class="flex flex-col items-center gap-1.5 p-3 rounded-xl hover:bg-orange-50 transition-all group">
+              <div class="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center text-orange-500 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-plus"></i>
+              </div>
+              <span class="text-[10px] font-medium text-slate-600">Add Product</span>
+            </a>
+            <a href="/admin/orders" class="flex flex-col items-center gap-1.5 p-3 rounded-xl hover:bg-blue-50 transition-all group">
+              <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform">
+                <i class="fa-regular fa-rectangle-list"></i>
+              </div>
+              <span class="text-[10px] font-medium text-slate-600">View Orders</span>
+            </a>
+            <a href="/all" class="flex flex-col items-center gap-1.5 p-3 rounded-xl hover:bg-emerald-50 transition-all group">
+              <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-store"></i>
+              </div>
+              <span class="text-[10px] font-medium text-slate-600">Visit Store</span>
+            </a>
+            <a href="/logout" class="flex flex-col items-center gap-1.5 p-3 rounded-xl hover:bg-red-50 transition-all group">
+              <div class="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-sign-out"></i>
+              </div>
+              <span class="text-[10px] font-medium text-slate-600">Logout</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      
     </div>
-
   </div>
 </div>
 

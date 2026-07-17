@@ -1,204 +1,148 @@
 <%- include('partials/header') %>
-<!-- SweetAlert2 CDN (কার্ট নোটিফিকেশনের জন্য) -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<div class="w-full bg-[#f8fafc] py-12 px-4 md:px-8 min-h-[85vh]">
-  <div class="max-w-6xl mx-auto bg-white border border-slate-100 p-4 md:p-8 shadow-[1px_1px_0px_rgba(0,0,0,0.02)]">
+<div class="min-h-[85vh] py-2  px-2">
+  <div class="max-w-6xl mx-auto
+   bg-white   p-2 md:p-8">
     
-    <!-- Back to store breadcrumb -->
-    <div class="mb-8">
-      <a href="/all" class="text-[10px] font-mono text-slate-400 uppercase tracking-widest hover:text-orange-600 transition-colors flex items-center gap-1.5">
-        <i class="fa-solid fa-arrow-left-long"></i> Back To Collection
-      </a>
-    </div>
+    <a href="/all" class="text-xs text-slate-400 hover:text-orange-600 transition-colors inline-flex items-center gap-2 mb-6">
+      <i class="fa-solid fa-arrow-left-long"></i> Back to Collection
+    </a>
 
-    <!-- Product Grid Container -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+    <div class="grid md:grid-cols-2 gap-8">
       
-      <!-- Left Column: Image Gallery System -->
-      <div class="flex flex-col gap-3">
-        <!-- Main Hero Image Frame -->
-        <div class="w-full aspect-square bg-slate-50 border border-slate-100 overflow-hidden relative group">
-          <img 
-            id="main-product-image" 
-            src="<%= product.images && product.images.length > 0 ? product.images[0] : '/placeholder.jpg' %>" 
-            alt="<%= product.name %>"
-            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          >
-          
-          <!-- Badges -->
-          <div class="absolute top-3 left-3 flex flex-col gap-1.5">
+      <!-- Gallery -->
+      <div>
+        <div class="relative aspect-square bg-slate-100 rounded-xl overflow-hidden">
+          <img id="main-product-image" src="<%= product.images?.[0] || '/placeholder.jpg' %>" alt="<%= product.name %>" class="w-full h-full object-cover">
+          <div class="absolute top-3 left-3 flex flex-col gap-1">
             <% if (product.isNewArrival) { %>
-              <span class="bg-slate-950 text-white font-mono text-[9px] font-bold uppercase px-2 py-0.5 tracking-wider">New Arrival</span>
+              <span class="bg-black text-white text-[10px] font-bold px-2 py-0.5 rounded">NEW</span>
             <% } %>
             <% if (product.isDiscount && product.price > product.discountPrice) { %>
-              <% const pct = Math.round(((product.price - product.discountPrice) / product.price) * 100); %>
-              <span class="bg-red-600 text-white font-mono text-[9px] font-bold uppercase px-2 py-0.5 tracking-wider">Save <%= pct %>%</span>
+              <span class="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">SAVE <%= Math.round(((product.price - product.discountPrice) / product.price) * 100) %>%</span>
             <% } %>
           </div>
         </div>
-
-        <!-- Thumbnails List (যদি একাধিক ইমেজ থাকে) -->
-        <% if (product.images && product.images.length > 1) { %>
-          <div class="grid grid-cols-5 gap-2">
-            <% product.images.forEach((img, index) => { %>
-              <div class="aspect-square bg-slate-50 border <%= index === 0 ? 'border-orange-600' : 'border-slate-200' %> overflow-hidden cursor-pointer thumb-box transition-colors">
-                <img src="<%= img %>" alt="preview" class="w-full h-full object-cover p-0.5">
+        <% if (product.images?.length > 1) { %>
+          <div class="grid grid-cols-5 gap-2 mt-3">
+            <% product.images.forEach((img, i) => { %>
+              <div class="aspect-square bg-slate-100 rounded-lg cursor-pointer thumb-box <%= i === 0 ? 'ring-2 ring-orange-500' : '' %>">
+                <img src="<%= img %>" class="w-full h-full object-cover rounded-lg">
               </div>
             <% }) %>
           </div>
         <% } %>
       </div>
 
-      <!-- Right Column: Premium Meta & Details -->
-      <div class="flex flex-col justify-between py-2">
-        <div>
-          <!-- Category Label -->
-          <span class="text-[10px] text-orange-600 font-mono font-bold uppercase tracking-widest block mb-1">
-            // <%= product.category %>
-          </span>
-          
-          <!-- Product Title -->
-          <h1 class="text-2xl md:text-3xl
-           font-black text-slate-950
-            tracking-tight leading-none mb-4 mt-4 uppercase">
-            <%= product.name %>
-          </h1>
-
-          <!-- Price Engine -->
-          <div class="flex items-baseline gap-3 mb-0
-           border-b border-dashed border-slate-100 pb-4">
-            <% if (product.isDiscount && product.discountPrice) { %>
-              <span class="text-2xl font-black text-slate-950 tracking-tight">৳<%= product.discountPrice %></span>
-              <span class="text-sm text-slate-400 line-through">৳<%= product.price %></span>
-            <% } else { %>
-              <span class="text-xl font-black text-slate-800
-               tracking-tight">৳<%= product.price %></span>
-            <% } %>
-          </div>
-
-          <!-- Product Bio / Short Intro -->
-
-          <!-- Product Main Long Description -->
-          <div class="text-sm text-slate-600 font-normal leading-relaxed mb-8 prose">
-            <p><%= product.bio || 'No detailed description available for this item.' %></p>
-          </div>
+      <!-- Details -->
+      <div class="flex flex-col">
+        <span class="text-[10px] text-orange-600 font-bold uppercase tracking-wider"><%= product.category %></span>
+        <h1 class="text-2xl font-bold text-slate-900 mt-1"><%= product.name %></h1>
+        
+        <div class="flex items-center gap-3 py-3 border-b border-slate-100">
+          <% if (product.isDiscount && product.discountPrice) { %>
+            <span class="text-2xl font-bold text-orange-600">৳<%= product.discountPrice %></span>
+            <span class="text-sm text-slate-400 line-through">৳<%= product.price %></span>
+          <% } else { %>
+            <span class="text-2xl font-bold text-slate-900">৳<%= product.price %></span>
+          <% } %>
         </div>
 
-        <!-- Action / Add to Cart Block -->
-        <div class="bg-slate-50 border border-slate-100 p-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-          <!-- Quantity Counter Component -->
-          <div class="flex items-center border border-slate-200 bg-white">
-            <button id="qty-minus" class="px-3 py-2 text-slate-500 hover:bg-slate-50 font-mono transition-colors text-xs">-</button>
-            <input id="qty-input" type="number" value="1" min="1" class="w-12 text-center text-xs font-bold font-mono border-none focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-            <button id="qty-plus" class="px-3 py-2 text-slate-500 hover:bg-slate-50 font-mono transition-colors text-xs">+</button>
-          </div>
+        <p class="text-sm text-slate-600 
+        leading-relaxed my-4  whitespace-pre-line" style=""><%= product.bio || 'No description available.' %></p>
 
-          <!-- Add to Cart Button -->
-          <button 
-            id="add-to-cart-action"
+        <!-- Features -->
+        <div class="grid grid-cols-2 gap-2 text-xs text-slate-600 mb-4">
+          <div><i class="fa-regular fa-circle-check text-emerald-500 mr-1"></i> Premium</div>
+          <div><i class="fa-regular fa-circle-check text-emerald-500 mr-1"></i> Free Ship</div>
+          <div><i class="fa-regular fa-circle-check text-emerald-500 mr-1"></i> 24/7 Support</div>
+          <div><i class="fa-regular fa-circle-check text-emerald-500 mr-1"></i> Secure</div>
+        </div>
+
+        <!-- Add to Cart -->
+        <div class="mt-auto bg-slate-50 p-4 rounded-xl flex flex-wrap items-center gap-3">
+          <div class="flex border border-slate-200 rounded-lg bg-white">
+            <button id="qty-minus" class="px-3 py-2 text-slate-500 hover:bg-slate-50 rounded-l-lg">-</button>
+            <input id="qty-input" type="number" value="1" min="1" class="w-12 text-center text-sm font-bold border-none focus:outline-none [appearance:textfield]">
+            <button id="qty-plus" class="px-3 py-2 text-slate-500 hover:bg-slate-50 rounded-r-lg">+</button>
+          </div>
+          
+          <button id="add-to-cart-action" 
             data-id="<%= product._id %>"
             data-name="<%= product.name %>"
             data-price="<%= (product.isDiscount && product.discountPrice) ? product.discountPrice : product.price %>"
-            data-image="<%= product.images && product.images.length > 0 ? product.images[0] : '/placeholder.jpg' %>"
-            class="flex-grow bg-slate-950 hover:bg-orange-600 text-white font-mono font-bold text-xs py-3 uppercase tracking-widest transition-colors duration-300 flex items-center justify-center gap-2"
-          >
-            <i class="fa-solid fa-basket-shopping text-xs"></i> Add To Basket
+            data-image="<%= product.images?.[0] || '/placeholder.jpg' %>"
+            class="flex-1 bg-slate-900 hover:bg-orange-600 text-white text-sm font-bold py-2.5 px-4 rounded-lg transition-all flex items-center justify-center gap-2">
+            <i class="fa-solid fa-basket-shopping"></i> Add to Cart
           </button>
         </div>
-
       </div>
-
     </div>
-
   </div>
 </div>
 
-<%- include('partials/header') %>
+<%- include('partials/recent') %>
 
-<script type="text/javascript">
-  document.addEventListener('DOMContentLoaded', () => {
-    // ১. থাম্বনেইল গ্যালারি কন্ট্রোল লজিক
-    const mainImg = document.getElementById('main-product-image');
-    const thumbs = document.querySelectorAll('.thumb-box');
 
-    thumbs.forEach(thumb => {
-      thumb.addEventListener('click', function() {
-        // আগের একটিভ ক্লাস রিমুভ করা
-        thumbs.forEach(t => t.classList.remove('border-orange-600'));
-        thumbs.forEach(t => t.classList.add('border-slate-200'));
-        
-        // বর্তমান থাম্বনেইল হাইলাইট
-        this.classList.remove('border-slate-200');
-        this.classList.add('border-orange-600');
-        
-        // মেইন ইমেজ চেঞ্জ
-        const targetSrc = this.querySelector('img').getAttribute('src');
-        mainImg.setAttribute('src', targetSrc);
-      });
-    });
+<%- include('partials/footer') %>
 
-    // ২. কোয়ান্টিটি কাউন্টার কাউন্ট লজিক
-    const qtyInput = document.getElementById('qty-input');
-    const qtyMinus = document.getElementById('qty-minus');
-    const qtyPlus = document.getElementById('qty-plus');
-
-    qtyMinus.addEventListener('click', () => {
-      let val = parseInt(qtyInput.value);
-      if(val > 1) qtyInput.value = val - 1;
-    });
-
-    qtyPlus.addEventListener('click', () => {
-      let val = parseInt(qtyInput.value);
-      qtyInput.value = val + 1;
-    });
-
-    // ৩. রিয়েল কার্ট মেকানিজম (LocalStorage ইন্টারফেস)
-    const cartBtn = document.getElementById('add-to-cart-action');
-    
-    cartBtn.addEventListener('click', () => {
-      const quantityToAdd = parseInt(qtyInput.value) || 1;
-      
-      const productObj = {
-        id: cartBtn.dataset.id,
-        name: cartBtn.dataset.name,
-        price: parseFloat(cartBtn.dataset.price),
-        image: cartBtn.dataset.image,
-        quantity: quantityToAdd
-      };
-
-      // লোকাল স্টোরেজ থেকে কার্ট অ্যারে আনা বা নতুন তৈরি করা
-      let cart = JSON.parse(localStorage.getItem('cart')) || [];
-      
-      // প্রোডাক্ট আগে থেকেই কার্টে আছে কিনা দেখা
-      const existingItem = cart.find(item => item.id === productObj.id);
-      
-      if (existingItem) {
-        existingItem.quantity += quantityToAdd;
-      } else {
-        cart.push(productObj);
-      }
-
-      // আপডেট করা কার্ট সেভ করা
-      localStorage.setItem('cart', JSON.stringify(cart));
-
-      // গ্লোবাল কার্ট কাউন্ট আপডেট ইভেন্ট ট্রিগার করা (হেডারের জন্য)
-      const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-      window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { totalItems: totalCount } }));
-
-      // প্রিমিয়াম সুইট অ্যালার্ট টোস্ট নোটিফিকেশন
-      Swal.fire({
-        title: 'Basket Updated',
-        text: `${quantityToAdd}x ${productObj.name} added.`,
-        icon: 'success',
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 1800,
-        background: '#0f172a',
-        color: '#fff',
-        iconColor: '#ea580c'
-      });
-    });
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Gallery
+  const mainImg = document.getElementById('main-product-image');
+  document.querySelectorAll('.thumb-box').forEach((thumb, i, arr) => {
+    thumb.onclick = () => {
+      arr.forEach(t => t.classList.remove('ring-2', 'ring-orange-500'));
+      thumb.classList.add('ring-2', 'ring-orange-500');
+      mainImg.src = thumb.querySelector('img').src;
+    };
   });
+
+  // Quantity
+  const qty = document.getElementById('qty-input');
+  document.getElementById('qty-minus').onclick = () => { if(qty.value > 1) qty.value--; };
+  document.getElementById('qty-plus').onclick = () => qty.value++;
+
+  // Add to Cart
+  document.getElementById('add-to-cart-action').onclick = function() {
+    const q = parseInt(qty.value) || 1;
+    const p = { id: this.dataset.id, name: this.dataset.name, price: parseFloat(this.dataset.price), image: this.dataset.image, quantity: q };
+    
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const exist = cart.find(item => item.id === p.id);
+    exist ? exist.quantity += q : cart.push(p);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    
+    const total = cart.reduce((s, i) => s + i.quantity, 0);
+    window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { totalItems: total } }));
+    
+    Swal.fire({ icon: 'success', title: 'Added!', text: `${q}x ${p.name}`, toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, background: '#0f172a', color: '#fff', iconColor: '#ea580c' });
+  };
+});
+</script>
+
+
+
+
+
+<script>
+  // ১. প্রোডাক্টের ডাটা ফ্রন্টএন্ডে নিয়ে নিলাম
+  const thisProduct = {
+    id: "<%= product._id %>",
+    name: `<%= product.name %>`,
+    price: "<%= product.price %>",
+    image: "<%= product.images && product.images[0] ? product.images[0] : '' %>"
+  };
+
+  // ২. লোকালস্টোরেজ থেকে পুরোনো লিস্ট আনলাম, না থাকলে খালি অ্যারে নিলাম
+  let list = JSON.parse(localStorage.getItem("recent_items")) || [];
+
+  // ৩. ডুপ্লিকেট ডিলিট করে নতুনটা সবার আগে (unshift) বসালাম
+  list = list.filter(item => item.id !== thisProduct.id);
+  list.unshift(thisProduct);
+
+  // ৪. ১০ টার বেশি হয়ে গেলে শেষেরটা বাদ দিয়ে আবার সেভ করলাম
+  if (list.length > 10) list.pop();
+  localStorage.setItem("recent_items", JSON.stringify(list));
 </script>

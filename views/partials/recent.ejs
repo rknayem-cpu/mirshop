@@ -1,0 +1,57 @@
+<!-- 🕒 রিসেন্টলি দেখা প্রোডাক্টের সেকশন (Side Scroll Able) -->
+<div id="recent-box" class="w-full bg-neutral-50 py-10 px-4 hidden">
+  <div class="max-w-7xl mx-auto">
+    
+    <h2 class="text-base font-bold text-neutral-800 uppercase tracking-wider mb-6">
+      Recently Viewed Items
+    </h2>
+
+    <!-- 💡 পরিবর্তন এখানে: গ্রিড বাদ দিয়ে flex এবং overflow-x-auto করা হয়েছে -->
+    <div id="recent-grid" class="flex gap-4 overflow-x-auto pb-4 scroll-smooth snap-x snap-mandatory" style="-webkit-overflow-scrolling: touch; scrollbar-width: none;">
+      <!-- প্রোডাক্ট কার্ডগুলো এখানে এসে এক লাইনে জমা হবে -->
+    </div>
+
+  </div>
+</div>
+
+<!-- স্ক্রলবার হাইড করার জন্য একটা ছোট্ট স্টাইল (অপশনাল কিন্তু সুন্দর দেখাবে) -->
+<style>
+  #recent-grid::-webkit-scrollbar {
+    display: none; /* ক্রোম, সাফারি এবং ওপেন ব্রাউজারে স্ক্রলবার হাইড করবে */
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const recentBox = document.getElementById("recent-box");
+    const recentGrid = document.getElementById("recent-grid");
+    
+    // লোকালস্টোরেজ থেকে দেখা প্রোডাক্টগুলো নিয়ে আসলাম
+    let items = JSON.parse(localStorage.getItem("recent_items")) || [];
+
+    // যদি কোনো প্রোডাক্ট দেখা হয়ে থাকে, তবেই সেকশনটা স্ক্রিনে দেখাবে
+    if (items.length > 0) {
+      recentBox.classList.remove("hidden"); // লুকানো সেকশন দেখাও
+      recentGrid.innerHTML = ""; // গ্রিড খালি করো
+
+      items.forEach(p => {
+        // 💡 কার্ডের উইথ ফিক্সড করা হয়েছে (w-[170px] sm:w-[210px]) এবং shrink-0 দেওয়া হয়েছে জাতে চ্যাপ্টা না হয়ে যায়
+        const card = `
+          <div class="bg-white border border-neutral-200 rounded-xl p-3 flex flex-col justify-between shadow-sm w-[170px] sm:w-[210px] shrink-0 snap-start transition-all duration-300 hover:shadow-md">
+            <div class="w-full aspect-square overflow-hidden rounded-lg bg-neutral-100">
+              <img src="${p.image}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://placehold.co/300';">
+            </div>
+            <div class="mt-2 flex-1 flex flex-col justify-between">
+              <h3 class="text-xs font-semibold text-neutral-700 line-clamp-2 min-h-[32px]">${p.name}</h3>
+              <div class="flex justify-between items-center mt-3 pt-2 border-t border-neutral-100">
+                <span class="text-xs font-bold text-neutral-900">৳${p.price}</span>
+                <a href="/products/details/${p.id}" class="text-[10px] bg-neutral-900 text-white px-2.5 py-1 rounded-md transition-colors hover:bg-orange-600">View</a>
+              </div>
+            </div>
+          </div>
+        `;
+        recentGrid.innerHTML += card;
+      });
+    }
+  });
+</script>

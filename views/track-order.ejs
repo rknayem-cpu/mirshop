@@ -74,19 +74,29 @@
               const statuses = ['Pending', 'Processing', 'Shipped', 'Delivered'];
               const currentStepIndex = statuses.indexOf(order.status);
 
+              
+              
               // ডেটাবেজের statusHistory থেকে টাইম ও ডেট পার্স করার হেল্পার ফাংশন
-              function getLogTime(statusName) {
-                if (!order.statusHistory || order.statusHistory.length === 0) return null;
-                const log = order.statusHistory.find(h => h.status === statusName);
-                if (!log) return null;
-                
-                const dateObj = new Date(log.changedAt);
-                const dateStr = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-                const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-                
-                return { dateStr, timeStr };
-              }
+function getLogTime(statusName) {
+  if (!order.statusHistory || order.statusHistory.length === 0) return null;
+  const log = order.statusHistory.find(h => h.status === statusName);
+  if (!log) return null;
 
+  const dateObj = new Date(log.changedAt);
+  
+  // 🇧🇩 বাংলাদেশ টাইমজোন (Asia/Dhaka) অপশন সেট করা হলো
+  const optionsDate = { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Dhaka' };
+  const optionsTime = { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Dhaka' };
+
+  const dateStr = dateObj.toLocaleDateString('en-GB', optionsDate);
+  const timeStr = dateObj.toLocaleTimeString('en-US', optionsTime);
+
+  return { dateStr, timeStr };
+}
+
+              
+              
+              
               const pendingTime = getLogTime('Pending');
               const processingTime = getLogTime('Processing');
               const shippedTime = getLogTime('Shipped');

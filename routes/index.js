@@ -8,9 +8,20 @@ const Order = require('../models/Order'); // মড েলট ি ইম
 
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+
+router.get('/', async (req, res) => {
+    try {
+        // হোমপেজের জন্য আমরা সর্বোচ্চ ৩০ বা ৪০টি প্রোডাক্ট তুলে নিয়ে আসব
+        const homepageProducts = await Product.find({}).sort({ createdAt: -1 }).limit(40);
+        res.render('index', { products: homepageProducts });
+    } catch (err) {
+        console.error(err);
+        res.render('index', { products: [] });
+    }
 });
+
+
+
 
 
 
@@ -24,6 +35,7 @@ function isAdmin(req, res, next) {
     }
     // ন া থ াকল ে প াসওয় ার ্ড দ েওয় ার প েজ ে র িড াইর েক ্ট করব ে
     res.redirect('/admin-login');
+    
 }
 
 
@@ -115,7 +127,7 @@ router.post('/add',isAdmin, async (req, res) => {
     await newProduct.save();
 
     // সফলভাবে সেভ হলে রিডাইরেক্ট বা মেসেজ পাঠানো (আপনার ইচ্ছা অনুযায়ী পরিবর্তন করতে পারেন)
-    res.render("add",{status:'add successful'});
+    res.render("add",{status:'product added successful'});
     
   } catch (error) {
     console.error("Error saving product:", error);

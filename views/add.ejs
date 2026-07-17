@@ -1,24 +1,31 @@
 <%- include('partials/header') %>
 
-<div class="max-w-2xl mx-auto bg-white p-6 my-8 shadow-md border-t-4 border-orange-600">
-  <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+<div class="max-w-2xl mx-auto bg-white p-6 my-2 mt-0
+ ">
+ 
+ 
+   <a  href="/admin/dashboard" class="hover:text-blue-500 hover:underline
+mb-5 block text-blue-600">Back to dashboard</a>
+ 
+  <h2 class="text-xl font-bold 
+  text-gray-800 mb-6 flex items-center gap-2">
     <i class="fa-solid fa-plus-circle text-orange-600"></i> Add New Product
   </h2>
 
-<%= status || '' %>
+<span class= "py-1 text-green-500 relative bottom-3"><%= status || '' %></span>
 
   <!-- Product Form -->
   <form action="/add" method="POST" class="space-y-4 text-sm text-gray-700">                                            
     <!-- Product Name -->
     <div>
       <label class="block font-medium mb-1">Product Name *</label>
-      <input type="text" name="name" required class="w-full border border-gray-300 p-2 focus:outline-orange-600">
+      <input placeholder="Enter Product Name.."  type="text" name="name" required class="w-full border border-gray-300 p-2 focus:outline-orange-600">
     </div>
 
     <!-- Bio / Description -->
     <div>
       <label class="block font-medium mb-1">Product Bio *</label>
-      <textarea name="bio" required rows="3" class="w-full border border-gray-300 p-2 focus:outline-orange-600"></textarea>
+      <textarea name="bio" placeholder="Enter product description.."  required rows="3" class="w-full border border-gray-300 p-2 focus:outline-orange-600"></textarea>
     </div>
 
     <!-- Image URLs -->
@@ -46,10 +53,11 @@
       <label class="block font-medium mb-1">Category *</label>
       <select name="category" required class="w-full border border-gray-300 p-2 bg-white focus:outline-orange-600">
         <option value="">Select Category</option>
-        <option value="T-Shirt">T-Shirt</option>
-        <option value="Mug">Custom Mug</option>
-        <option value="ID Card">PVC ID Card</option>
-        <option value="Gadgets">Gadgets</option>
+        <option value="popular">popular</option>
+        <option value="health">health</option>
+        <option value="food">food</option>
+        <option value="electronics">Electronics</option>
+        <option value="others">others</option>
       </select>
     </div>
 

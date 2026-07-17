@@ -1,0 +1,150 @@
+<!-- ✨ MODERN STYLISH PRODUCT GRID INTERFACE (IMAGES ARRAY FIX) -->
+<div class="w-full bg-[#fafafa] py-16 px-0">
+  <div class="max-w-7xl mx-auto">
+    
+    <!-- Section Header Area -->
+    <div class="mb-10 flex justify-between items-end border-b border-neutral-200 pb-4">
+      <div>
+        <span class="text-[10px] font-mono tracking-widest uppercase text-orange-600 block mb-1">// CURATED INVENTORY</span>
+        <h2 class="text-xl font-extrabold tracking-tight text-neutral-900 uppercase">
+          New Arrivals
+        </h2>
+      </div>
+      <div class="text-xs font-mono text-neutral-400 uppercase tracking-wider">
+        Grid Tracker v2.0
+      </div>
+    </div>
+
+    <!-- 📦 The Responsive Grid -->
+    <div id="product-grid" class="grid grid-cols-2
+     sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+      <% if (typeof products !== 'undefined' && products.length > 0) { %>
+        <% products.forEach((product, index) => { %>
+          
+          <!-- 💡 Product Premium Card Frame (First 10 visible, rest hidden) -->
+          <div class="product-item-card <%= index >= 10 ? 'hidden' : '' %> bg-white border border-neutral-200/80 rounded-xl overflow-hidden flex flex-col justify-between h-full group transition-all duration-300 hover:shadow-[0_12px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1">
+            
+            <!-- Modern Interactive Image Wrapper -->
+            <div class="w-full aspect-square bg-neutral-50 overflow-hidden relative border-b border-neutral-100">
+              
+              <!-- 🖼️ ARRAY IMAGE LOGIC FIX: অ্যারের প্রথম ছবি এক্সট্র্যাক্ট করা হচ্ছে -->
+              <% 
+                let finalImgSrc = ""; // ডিফল্ট ব্যাকআপ ইমেজ
+                
+                if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+                  finalImgSrc = product.images[0]; // অ্যারের একদম প্রথম ছবি
+                } else if (typeof product.image === 'string' && product.image) {
+                  finalImgSrc = product.image;
+                } else if (typeof product.imageUrl === 'string' && product.imageUrl) {
+                  finalImgSrc = product.imageUrl;
+                }
+              %>
+              
+              <img src="<%= finalImgSrc %>" 
+                   alt="<%= product.name %>" 
+                   class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                   >
+              
+              <!-- Clean Category Pill -->
+              <% if (product.category) { %>
+                <span class="absolute top-3 left-3 bg-white/80 backdrop-blur-md border border-neutral-200 text-neutral-800 text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full shadow-sm">
+                  <%= product.category %>
+                </span>
+              <% } %>
+            </div>
+
+            <!-- Sleek Product Info Content -->
+            <div class="p-4 flex-1 flex flex-col justify-between bg-white">
+              <div class="space-y-1">
+                <h3 class="text-xs font-bold text-neutral-800 transition-colors group-hover:text-orange-600 line-clamp-2 min-h-[34px] leading-tight">
+                  <%= product.name %>
+                </h3>
+                
+              </div>
+
+              <!-- Price & Modern View Button -->
+              <div class="flex items-center justify-between pt-3 mt-3 border-t border-neutral-100">
+                <div class="flex flex-col">
+                  <span class="text-[8px] font-mono text-neutral-400 uppercase leading-none mb-0.5">Price</span>
+                  <span class="text-sm font-black text-neutral-900 font-sans">
+                    ৳<%= product.price %>
+                  </span>
+                </div>
+                
+                <!-- View Button -->
+                <a href="/products/details/<%= product._id %>" class="bg-neutral-900 hover:bg-orange-600 text-white font-mono text-[10px] font-semibold px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1">
+                  View <span class="transition-transform group-hover:translate-x-0.5">&rarr;</span>
+                </a>
+              </div>
+            </div>
+
+          </div>
+
+        <% }) %>
+      <% } else { %>
+        <!-- Empty State Module -->
+        <div class="col-span-full text-center py-16 bg-white border border-neutral-200 rounded-xl shadow-sm">
+          <svg class="w-8 h-8 text-neutral-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+          <p class="text-xs font-mono text-neutral-400 uppercase tracking-widest">No items found in stock.</p>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- 🔄 Dynamic Action Pipeline (Button / Hyperlink Switcher) -->
+    <% if (typeof products !== 'undefined' && products.length > 10) { %>
+      <div class="text-center mt-12">
+        <button id="load-more-btn" class="inline-flex items-center justify-center bg-white hover:bg-neutral-950 hover:text-white text-neutral-900 font-mono text-xs font-bold px-8 py-3.5 uppercase tracking-widest transition-all duration-200 border border-neutral-300 rounded-full shadow-sm cursor-pointer active:scale-[0.98]">
+          Load More Items
+        </button>
+      </div>
+    <% } %>
+
+  </div>
+</div>
+
+<!-- ⚙️ 3-Click Transformation Logic -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const loadMoreBtn = document.getElementById("load-more-btn");
+    if (!loadMoreBtn) return;
+
+    let clickCount = 0; 
+    const limitPerPage = 10; 
+
+    loadMoreBtn.addEventListener("click", function(e) {
+      clickCount++; 
+
+      const hiddenCards = Array.from(document.querySelectorAll(".product-item-card.hidden"));
+
+      if (clickCount <= 2) {
+        const cardsToShow = hiddenCards.slice(0, limitPerPage);
+        cardsToShow.forEach(card => {
+          card.classList.remove("hidden");
+          card.style.opacity = '0';
+          setTimeout(() => {
+            card.style.transition = 'opacity 0.4s ease';
+            card.style.opacity = '1';
+          }, 10);
+        });
+
+        if (document.querySelectorAll(".product-item-card.hidden").length === 0 && clickCount < 2) {
+          loadMoreBtn.style.display = 'none';
+          return;
+        }
+      }
+      
+      // 🚀 2nd ক্লিকে বাটনটি ৩ নম্বর ক্লিকের জন্য <a> লিঙ্কে রূপান্তর হবে
+      if (clickCount === 2) {
+        setTimeout(() => {
+          const linkBtn = document.createElement("a");
+          linkBtn.href = "/all"; 
+          linkBtn.id = "load-more-btn";
+          linkBtn.className = loadMoreBtn.className + " bg-neutral-950 text-white border-neutral-950 hover:bg-orange-600 hover:border-orange-600"; 
+          linkBtn.innerText = "View All Products ➔";
+          
+          loadMoreBtn.parentNode.replaceChild(linkBtn, loadMoreBtn);
+        }, 50);
+      }
+    });
+  });
+</script>
