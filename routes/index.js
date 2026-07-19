@@ -541,7 +541,7 @@ router.get('/admin/orders/download-memo/:id', async (req, res) => {
         page.drawText(`${order.address}`, { x: 170, y: H - 430, size: 25, font: banglaFont });
 
         let currentY = H - 533;
-        const rowHeight = 30.5;
+        const rowHeight = 40.5;
 
         order.items.forEach((item, index) => {
             if (index < 10) {
@@ -563,7 +563,7 @@ router.get('/admin/orders/download-memo/:id', async (req, res) => {
         const discount = order.discount || 0;
         page.drawText(`${discount}`, { x: 640, y: H - 964, size: 26, font: banglaFont });
         
-        const deliveryCharge = order.deliveryCharge || 0;
+        const deliveryCharge = 100;
         page.drawText(`${deliveryCharge}`, { x: 640, y: H - 1000, size: 26, font: banglaFont });
         
         
