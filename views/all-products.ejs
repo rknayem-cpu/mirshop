@@ -90,6 +90,20 @@ from-slate-50 to-white py-8 px-3 md:px-4">
                  uppercase rounded-sm  tracking-widest transition">
                 + Add to cart
               </button>
+              
+              
+    
+  
+  
+  <button data-id="${p._id}" data-name="${p.name}" data-price="${price}" data-image="${p.images[0]}"
+    class="order-now-btn relative top-1  w-full bg-orange-500 hover:bg-orange-600 text-white text-[9px] font-bold py-2 uppercase rounded-sm tracking-widest transition">
+    Order Now
+  </button>
+</div>
+
+              
+              
+              
             </div>
           </div>
         `;
@@ -121,16 +135,21 @@ from-slate-50 to-white py-8 px-3 md:px-4">
     }
   }
 
-  // 🛒 Add to Cart
-  grid.addEventListener('click', e => {
-    const btn = e.target.closest('.add-btn');
-    if (!btn) return;
 
+
+
+
+
+// 🛒 Add to Cart & ⚡ Order Now Button Click Handler
+grid.addEventListener('click', e => {
+  // ১. Add to Cart বাটন চেক
+  const addBtn = e.target.closest('.add-btn');
+  if (addBtn) {
     const item = {
-      id: btn.dataset.id,
-      name: btn.dataset.name,
-      price: parseFloat(btn.dataset.price),
-      image: btn.dataset.image,
+      id: addBtn.dataset.id,
+      name: addBtn.dataset.name,
+      price: parseFloat(addBtn.dataset.price),
+      image: addBtn.dataset.image,
       quantity: 1
     };
 
@@ -155,7 +174,32 @@ from-slate-50 to-white py-8 px-3 md:px-4">
       color: 'white',
       iconColor: 'green'
     });
-  });
+    return;
+  }
+
+
+
+  // ⚡ Order Now বাটন চেক
+  const orderBtn = e.target.closest('.order-now-btn');
+  if (orderBtn) {
+    const directItem = {
+      id: orderBtn.dataset.id,
+      name: orderBtn.dataset.name,
+      price: parseFloat(orderBtn.dataset.price),
+      image: orderBtn.dataset.image,
+      quantity: 1
+    };
+
+    localStorage.setItem('direct_checkout_item', JSON.stringify(directItem));
+    
+    // 🎯 ইউআরএল-এ ?direct=true পাঠিয়ে দিচ্ছি
+    window.location.href = '/checkout?direct=true';
+  }
+
+
+ });
+
+
 
   // 👁️ Infinite Scroll Observer
   const observer = new IntersectionObserver(entries => {

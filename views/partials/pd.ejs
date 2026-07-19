@@ -1,7 +1,5 @@
-<!-- ✨ MODERN STYLISH PRODUCT GRID INTERFACE (IMAGES ARRAY FIX) -->
 <div class="w-full bg-[#fafafa] py-16 px-0">
   <div class="max-w-7xl mx-auto">
-    
     <!-- Section Header Area -->
     <div class="mb-10 flex justify-between items-end border-b border-neutral-200 pb-4">
       <div>
@@ -16,35 +14,29 @@
     </div>
 
     <!-- 📦 The Responsive Grid -->
-    <div id="product-grid" class="grid grid-cols-2
-     sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+    <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4">
       <% if (typeof products !== 'undefined' && products.length > 0) { %>
         <% products.forEach((product, index) => { %>
-          
+
           <!-- 💡 Product Premium Card Frame (First 10 visible, rest hidden) -->
           <div class="product-item-card <%= index >= 10 ? 'hidden' : '' %> bg-white border border-neutral-200/80 rounded-xl overflow-hidden flex flex-col justify-between h-full group transition-all duration-300 hover:shadow-[0_12px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1">
-            
+
             <!-- Modern Interactive Image Wrapper -->
             <div class="w-full aspect-square bg-neutral-50 overflow-hidden relative border-b border-neutral-100">
-              
-              <!-- 🖼️ ARRAY IMAGE LOGIC FIX: অ্যারের প্রথম ছবি এক্সট্র্যাক্ট করা হচ্ছে -->
-              <% 
-                let finalImgSrc = ""; // ডিফল্ট ব্যাকআপ ইমেজ
-                
+              <!-- 🖼️ ARRAY IMAGE LOGIC FIX -->
+              <%
+                let finalImgSrc = ""; 
                 if (product.images && Array.isArray(product.images) && product.images.length > 0) {
-                  finalImgSrc = product.images[0]; // অ্যারের একদম প্রথম ছবি
+                  finalImgSrc = product.images[0]; 
                 } else if (typeof product.image === 'string' && product.image) {
                   finalImgSrc = product.image;
                 } else if (typeof product.imageUrl === 'string' && product.imageUrl) {
                   finalImgSrc = product.imageUrl;
                 }
               %>
-              
-              <img src="<%= finalImgSrc %>" 
-                   alt="<%= product.name %>" 
-                   class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                   >
-              
+
+              <img src="<%= finalImgSrc %>" alt="<%= product.name %>" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+
               <!-- Clean Category Pill -->
               <% if (product.category) { %>
                 <span class="absolute top-3 left-3 bg-white/80 backdrop-blur-md border border-neutral-200 text-neutral-800 text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full shadow-sm">
@@ -59,7 +51,6 @@
                 <h3 class="text-xs font-bold text-neutral-800 transition-colors group-hover:text-orange-600 line-clamp-2 min-h-[34px] leading-tight">
                   <%= product.name %>
                 </h3>
-                
               </div>
 
               <!-- Price & Modern View Button -->
@@ -70,11 +61,19 @@
                     ৳<%= product.price %>
                   </span>
                 </div>
-                
-                <!-- View Button -->
+
+                <!-- View Details Button -->
                 <a href="/products/details/<%= product._id %>" class="bg-neutral-900 hover:bg-orange-600 text-white font-mono text-[10px] font-semibold px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1">
                   View <span class="transition-transform group-hover:translate-x-0.5">&rarr;</span>
                 </a>
+              </div>
+
+              <!-- ⚡ Order Now Button Area (নিচে ফুল-উইডথ সুন্দরভাবে সেট করা হয়েছে) -->
+              <div class="mt-2.5">
+                <button data-id="<%= product._id %>" data-name="<%= product.name %>" data-price="<%= product.price %>" data-image="<%= finalImgSrc %>"
+                  class="order-now-btn w-full bg-orange-500 hover:bg-orange-600 text-white text-[10px] font-bold py-2.5 uppercase rounded-lg tracking-widest transition-all shadow-sm active:scale-[0.99] cursor-pointer">
+                  Order Now
+                </button>
               </div>
             </div>
 
@@ -102,49 +101,74 @@
   </div>
 </div>
 
-<!-- ⚙️ 3-Click Transformation Logic -->
+<!-- ⚙️ JavaScript Logics -->
 <script>
   document.addEventListener("DOMContentLoaded", () => {
+    const grid = document.getElementById("product-grid");
     const loadMoreBtn = document.getElementById("load-more-btn");
-    if (!loadMoreBtn) return;
 
-    let clickCount = 0; 
-    const limitPerPage = 10; 
+    // ⚡ ১. Order Now বাটন ক্লিক হ্যান্ডলার (Event Delegation)
+    if (grid) {
+      grid.addEventListener('click', e => {
+        const orderBtn = e.target.closest('.order-now-btn');
+        if (!orderBtn) return;
 
-    loadMoreBtn.addEventListener("click", function(e) {
-      clickCount++; 
+        // বাটনের ডাটা অ্যাট্রিবিউট থেকে ইনফো নেওয়া হচ্ছে
+        const directItem = {
+          id: orderBtn.dataset.id,
+          name: orderBtn.dataset.name,
+          price: parseFloat(orderBtn.dataset.price),
+          image: orderBtn.dataset.image,
+          quantity: 1
+        };
 
-      const hiddenCards = Array.from(document.querySelectorAll(".product-item-card.hidden"));
+        // লোকালস্টোরেজে সেট করা হচ্ছে
+        localStorage.setItem('direct_checkout_item', JSON.stringify(directItem));
 
-      if (clickCount <= 2) {
-        const cardsToShow = hiddenCards.slice(0, limitPerPage);
-        cardsToShow.forEach(card => {
-          card.classList.remove("hidden");
-          card.style.opacity = '0';
-          setTimeout(() => {
-            card.style.transition = 'opacity 0.4s ease';
-            card.style.opacity = '1';
-          }, 10);
-        });
+        // 🎯 ইউআরএল মার্কার ?direct=true সহ সরাসরি চেকআউটে রিডাইরেক্ট
+        window.location.href = '/checkout?direct=true';
+      });
+    }
 
-        if (document.querySelectorAll(".product-item-card.hidden").length === 0 && clickCount < 2) {
-          loadMoreBtn.style.display = 'none';
-          return;
+    // 🔄 ২. 3-Click Transformation Logic (Load More)
+    if (loadMoreBtn) {
+      let clickCount = 0;
+      const limitPerPage = 10;
+
+      loadMoreBtn.addEventListener("click", function(e) {
+        clickCount++;
+        const hiddenCards = Array.from(document.querySelectorAll(".product-item-card.hidden"));
+
+        if (clickCount <= 2) {
+          const cardsToShow = hiddenCards.slice(0, limitPerPage);
+          cardsToShow.forEach(card => {
+            card.classList.remove("hidden");
+            card.style.opacity = '0';
+            setTimeout(() => {
+              card.style.transition = 'opacity 0.4s ease';
+              card.style.opacity = '1';
+            }, 10);
+          });
+
+          if (document.querySelectorAll(".product-item-card.hidden").length === 0 && clickCount < 2) {
+            loadMoreBtn.style.display = 'none';
+            return;
+          }
         }
-      }
-      
-      // 🚀 2nd ক্লিকে বাটনটি ৩ নম্বর ক্লিকের জন্য <a> লিঙ্কে রূপান্তর হবে
-      if (clickCount === 2) {
-        setTimeout(() => {
-          const linkBtn = document.createElement("a");
-          linkBtn.href = "/all"; 
-          linkBtn.id = "load-more-btn";
-          linkBtn.className = loadMoreBtn.className + " bg-neutral-950 text-white border-neutral-950 hover:bg-orange-600 hover:border-orange-600"; 
-          linkBtn.innerText = "View All Products ➔";
-          
-          loadMoreBtn.parentNode.replaceChild(linkBtn, loadMoreBtn);
-        }, 50);
-      }
-    });
+
+        // 🚀 2nd ক্লিকে বাটনটি ৩ নম্বর ক্লিকের জন্য <a> লিঙ্কে রূপান্তর হবে
+        if (clickCount === 2) {
+          setTimeout(() => {
+            const linkBtn = document.createElement("a");
+            linkBtn.href = "/all";
+            linkBtn.id = "load-more-btn";
+            linkBtn.className = loadMoreBtn.className + " bg-neutral-950 text-white border-neutral-950 hover:bg-orange-600 hover:border-orange-600 flex justify-center items-center";
+            linkBtn.innerText = "View All Products ➔";
+
+            loadMoreBtn.parentNode.replaceChild(linkBtn, loadMoreBtn);
+          }, 50);
+        }
+      });
+    }
   });
 </script>

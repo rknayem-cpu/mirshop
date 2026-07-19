@@ -4,7 +4,7 @@
 
 <div class="w-full bg-[#f8fafc] py-8 px-4 md:px-4 min-h-[80vh]">
   <div class="max-w-5xl mx-auto">
-    
+
     <!-- Title Section -->
     <div class="border-b-2 border-slate-950 pb-2 mb-6">
       <h1 class="text-xl font-black text-slate-950 tracking-wider uppercase flex items-center gap-2">
@@ -14,11 +14,11 @@
 
     <!-- Checkout Layout -->
     <div id="checkout-container" class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-      
+
       <!-- Left Column: Shipping Form -->
       <div class="lg:col-span-2 bg-white border border-slate-100 p-6 shadow-[1px_1px_0px_rgba(0,0,0,0.03)]">
         <h2 class="text-xs font-black text-slate-950 uppercase tracking-widest border-b border-slate-100 pb-2 mb-4">Shipping Address</h2>
-        
+
         <form id="checkout-form" class="space-y-4 text-xs font-mono text-slate-700">
           <!-- Full Name -->
           <div>
@@ -60,10 +60,10 @@
       <!-- Right Column: Slim Summary Overview -->
       <div class="bg-white border border-slate-100 p-4 shadow-[1px_1px_0px_rgba(0,0,0,0.05)]">
         <h2 class="text-xs font-black text-slate-950 uppercase tracking-widest border-b border-slate-100 pb-2 mb-3">Items Review</h2>
-        
+
         <!-- Cart Items Preview Box -->
-        <div id="checkout-items-preview" class="divide-y divide-slate-100 max-h-[260px] overflow-y-auto mb-4 pr-1">
-          <!-- JS দিয়ে ছোট ইমেজসহ রেন্ডার হবে -->
+        <div id="checkout-items-preview" class="divide-y divide-slate-100 max-h-[320px] overflow-y-auto mb-4 pr-1">
+          <!-- JS দিয়ে রেন্ডার হবে -->
         </div>
 
         <div class="space-y-2 text-[11px] font-mono text-slate-600 border-t border-slate-100 pt-3">
@@ -89,6 +89,10 @@
 
 <%- include('partials/footer') %>
 
+
+
+
+
 <script type="text/javascript">
   document.addEventListener('DOMContentLoaded', () => {
     const itemsPreview = document.querySelector('#checkout-items-preview');
@@ -96,52 +100,104 @@
     const totalEl = document.querySelector('#checkout-total');
     const checkoutForm = document.querySelector('#checkout-form');
 
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    let totalPrice = 0;
+    const delivery = 100;
+    let checkoutItems = [];
+    let isDirectOrder = false;
 
-    // ১. কার্ট খালি থাকলে রিডাইরেক্ট করে শপে ফেরত পাঠানো
-    if (cart.length === 0) {
+    // 🎯 ১. [FIXED] ইউআরএল (URL) চেক করছি direct=true আছে কিনা
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasDirectFlag = urlParams.get('direct') === 'true';
+    const directData = localStorage.getItem('direct_checkout_item');
+
+    if (hasDirectFlag && directData) {
+      // কন্ডিশন ১: লিংক-এ ফ্ল্যাগ আছে এবং ডেটাও আছে, তাই সিঙ্গেল অর্ডার দেখাবে
+      checkoutItems.push(JSON.parse(directData));
+      isDirectOrder = true;
+    } else {
+      // কন্ডিশন ২: কার্ট পেজ থেকে আসলে ডিরেক্ট ডেটা মুছে দিয়ে মেইন কার্ট দেখাবে
+      localStorage.removeItem('direct_checkout_item');
+      checkoutItems = JSON.parse(localStorage.getItem('cart')) || [];
+      isDirectOrder = false;
+    }
+
+    // কার্ট বা ডিরেক্ট আইটেম না থাকলে শপে ফেরত পাঠানো
+    if (checkoutItems.length === 0) {
       window.location.href = '/products/search';
       return;
     }
- let delivery = 100
-    // ২. রাইড সাইডবার এ সমারি রেন্ডার (ইমেজ মেকানিজম আপডেট করা হয়েছে)
-    cart.forEach(item => {
-      const itemTotal = item.price * item.quantity;
-      totalPrice += itemTotal;
 
-      itemsPreview.innerHTML += `
-        <div class="py-2.5 flex items-center justify-between text-[11px] gap-2">
-          <div class="flex items-center gap-2.5 truncate">
-            <!-- [UPDATED] ছোট ইমেজ থাম্বনেইল -->
-            <div class="w-8 h-8 bg-slate-50 border border-slate-200/80 flex-shrink-0 overflow-hidden">
-              <img src="${item.image}" alt="" class="w-full h-full object-cover">
+    // ২. সমারি ও ক্যালকুলেশন রেন্ডার করার মেইন ফাংশন
+    function updateCheckoutSummary() {
+      itemsPreview.innerHTML = '';
+      let totalPrice = 0;
+
+      checkoutItems.forEach((item, index) => {
+        const itemTotal = item.price * item.quantity;
+        totalPrice += itemTotal;
+
+        // ডিরেক্ট অর্ডার হলে প্লাস-মাইনাস বাটন দেখাবে, নরমাল কার্ট হলে শুধু কোয়ান্টিটি টেক্সট দেখাবে
+        const quantityControl = isDirectOrder
+          ? `<div class="flex items-center gap-1.5 mt-1">
+              <button type="button" onclick="window.changeDirectQty(-1)" class="w-5 h-5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded flex items-center justify-center font-sans font-bold text-xs transition-colors">-</button>
+              <span class="font-mono text-xs text-slate-800 font-bold px-1">${item.quantity}</span>
+              <button type="button" onclick="window.changeDirectQty(1)" class="w-5 h-5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded flex items-center justify-center font-sans font-bold text-xs transition-colors">+</button>
+             </div>`
+          : `<span class="font-mono text-[9px] text-slate-400 block mt-0.5">${item.quantity}x • ৳${item.price}</span>`;
+
+        itemsPreview.innerHTML += `
+          <div class="py-2.5 flex items-center justify-between text-[11px] gap-2">
+            <div class="flex items-center gap-2.5 truncate">
+              <div class="w-8 h-8 bg-slate-50 border border-slate-200/80 flex-shrink-0 overflow-hidden">
+                <img src="${item.image}" alt="" class="w-full h-full object-cover">
+              </div>
+              <div class="truncate">
+                <span class="text-slate-800 font-sans font-bold block line-clamp-1">${item.name}</span>
+                ${quantityControl}
+              </div>
             </div>
-            <!-- প্রোডাক্টের নাম ও কোয়ান্টিটি -->
-            <div class="truncate">
-              <span class="text-slate-800 font-sans font-bold block line-clamp-1">${item.name}</span>
-              <span class="font-mono text-[9px] text-slate-400 block mt-0.5">${item.quantity}x • ৳${item.price}</span>
-            </div>
+            <span class="font-mono font-bold text-slate-950 flex-shrink-0">৳${itemTotal}</span>
           </div>
-          <!-- টোটাল প্রাইস -->
-          <span class="font-mono font-bold text-slate-950 flex-shrink-0">৳${itemTotal}</span>
-        </div>
-      `;
-    });
+        `;
+      });
 
-    subtotalEl.innerText = `৳${totalPrice}`;
-    totalEl.innerText = `৳${totalPrice + delivery}`;
+      subtotalEl.innerText = `৳${totalPrice}`;
+      totalEl.innerText = `৳${totalPrice + delivery}`;
+    }
 
-    // ৩. অর্ডার প্লেস সাবমিট হ্যান্ডলার (AJAX)
+    // ৩. ডিরেক্ট অর্ডারের কোয়ান্টিটি প্লাস/মাইনাস করার গ্লোবাল ফাংশন
+    window.changeDirectQty = (amount) => {
+      if (!isDirectOrder || checkoutItems.length === 0) return;
+
+      let newQty = checkoutItems[0].quantity + amount;
+
+      // ১ এর নিচে নামতে পারবে না
+      if (newQty < 1) return;
+
+      checkoutItems[0].quantity = newQty;
+
+      // লোকালস্টোরেজ আপডেট করে রাখা
+      localStorage.setItem('direct_checkout_item', JSON.stringify(checkoutItems[0]));
+
+      // UI রি-রেন্ডার করা
+      updateCheckoutSummary();
+    };
+
+    // প্রথমবার পেজ লোডে রেন্ডার
+    updateCheckoutSummary();
+
+    // ৪. অর্ডার প্লেস সাবমিট হ্যান্ডলার (AJAX)
     checkoutForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+
+      let totalPrice = 0;
+      checkoutItems.forEach(item => { totalPrice += item.price * item.quantity; });
 
       const orderData = {
         name: document.querySelector('#cust-name').value.trim(),
         phone: document.querySelector('#cust-phone').value.trim(),
         email: document.querySelector('#cust-email').value.trim(),
         address: document.querySelector('#cust-address').value.trim(),
-        items: cart,
+        items: checkoutItems,
         totalAmount: totalPrice + delivery
       };
 
@@ -162,8 +218,13 @@
         const data = await response.json();
 
         if (data.success) {
-          localStorage.removeItem('cart');
-          window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { totalItems: 0 } }));
+          // অর্ডার সফল হলে নির্দিষ্ট কি (Key) রিমুভ করা
+          if (isDirectOrder) {
+            localStorage.removeItem('direct_checkout_item');
+          } else {
+            localStorage.removeItem('cart');
+            window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { totalItems: 0 } }));
+          }
 
           Swal.fire({
             title: 'Order Successful!',
@@ -171,12 +232,7 @@
             icon: 'success',
             confirmButtonColor: '#ea580c'
           }).then(() => {
-            
-            
-            
             window.location.href = `/order/placed/${data.orderId}`;
-            
-            
           });
         } else {
           Swal.fire('Error', data.message || 'Submission failed.', 'error');
@@ -188,3 +244,4 @@
     });
   });
 </script>
+

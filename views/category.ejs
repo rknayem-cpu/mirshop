@@ -16,8 +16,7 @@
     <!-- 📦 DYNAMIC CATEGORIES CONTAINER -->
     <div id="categories-root" class="space-y-12">
       <!-- ডাটা প্রোসেস হওয়ার সময় লোডার -->
-      <div class="flex flex-col
-       justify-center items-center py-20 gap-2">
+      <div class="flex flex-col justify-center items-center py-20 gap-2">
         <div class="animate-spin rounded-full h-6 w-6 border-2 border-orange-600 border-t-transparent"></div>
         <p class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Initializing Inventory Grid...</p>
       </div>
@@ -31,8 +30,8 @@
 <!-- ⚙️ FRONTEND CLIENT-SIDE PAGINATION ENGINE -->
 <script type="text/javascript">
   // ব্যাকএন্ড থেকে আসা সম্পূর্ণ প্রোডাক্ট অবজেক্ট
-  const allProducts = <%- JSON.stringify(products) %>; 
-  
+  const allProducts = <%- JSON.stringify(products) %>;
+
   // প্রতি ক্লিকে কয়টি করে প্রোডাক্ট লোড হবে এবং বর্তমান স্টেট ট্র্যাকিং
   const categoryLimits = {};
   const ITEMS_PER_PAGE = 20;
@@ -59,7 +58,7 @@
   function renderCategories() {
     const root = document.getElementById('categories-root');
     const grouped = groupProductsByCategory(allProducts);
-    
+
     if (Object.keys(grouped).length === 0) {
       root.innerHTML = `
         <div class="text-center py-16 bg-white border border-slate-200 rounded-xl shadow-sm">
@@ -71,7 +70,7 @@
     let htmlContent = '';
 
     for (const [category, products] of Object.entries(grouped)) {
-      
+
       if (categoryLimits[category] === undefined) {
         categoryLimits[category] = ITEMS_PER_PAGE;
       }
@@ -82,42 +81,36 @@
 
       htmlContent += `
         <!-- Category Segment Component -->
-        <div class="bg-white 
-          rounded-md p-4 ">
-          
+        <div class="bg-white rounded-md p-4 ">
+
           <!-- Category Label & Count Header -->
           <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-2">
             <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2 uppercase tracking-wide">
               <span class="w-1.5 h-3.5 bg-orange-600"></span>
-              ${category} 
+              ${category}
               <span class="text-[10px] font-mono font-medium text-slate-400 lowercase">(${products.length} items)</span>
             </h2>
           </div>
 
-          <!-- Product Inner Grid (ক্যাপসুল স্টাইল টাইট ডিজাইন) -->
+          <!-- Product Inner Grid -->
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             ${visibleProducts.map(p => {
-              // ⚡ আপনার সেই ইমেজ লজিক: অ্যারে চেক করে ১ম টা নেবে, যদি না থাকে তবে সিঙ্গেল ফিল্ড বা প্লেসহোল্ডার
-              const productImg = (p.images && Array.isArray(p.images) && p.images.length > 0) 
-                                 ? p.images[0] 
+              // ইমেজ লজিক
+              const productImg = (p.images && Array.isArray(p.images) && p.images.length > 0)
+                                 ? p.images[0]
                                  : (p.image || p.img || 'https://via.placeholder.com/300');
-              
+
               const orig = p.price || 250;
               const cur = p.isDiscount && p.discountPrice ? p.discountPrice : orig;
               const pct = (p.isDiscount && orig > cur) ? Math.round(((orig - cur) / orig) * 100) : 0;
 
               return `
-              <div class="bg-white flex flex-col
-               justify-between group 
-               overflow-hidden hover:-translate-y-1
-                hover:shadow-lg 
-                 transition-all duration-300 relative 
-                 border border-slate-200 rounded-md">
+              <div class="bg-white flex flex-col justify-between group overflow-hidden hover:-translate-y-1 hover:shadow-lg transition-all duration-300 relative border border-slate-200 rounded-md">
 
                 <!-- Image Frame -->
                 <a href="/products/details/${p._id}" class="block aspect-square bg-slate-50 overflow-hidden relative border-b border-slate-100/60">
-                  <img class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" 
-                       src="${productImg}" 
+                  <img class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                       src="${productImg}"
                        alt="${p.name}"
                        onerror="this.onerror=null;this.src='https://via.placeholder.com/300';">
 
@@ -133,15 +126,24 @@
                     </a>
                   </div>
 
-                  <!-- Price & Button -->
+                  <!-- Price & Buttons Layout -->
                   <div class="mt-2 pt-2 border-t border-dashed border-slate-100">
                     <div class="flex items-baseline gap-1.5 mb-2">
                       <span class="text-xs font-black text-slate-950 tracking-tight">৳${cur}</span>
                       ${pct ? `<span class="text-[9px] text-slate-400 line-through">৳${orig}</span>` : ''}
                     </div>
-                    <button data-id="${p._id}" data-name="${p.name}" data-price="${cur}" data-image="${productImg}" class="add-btn w-full bg-slate-950 group-hover:bg-orange-600 text-white font-mono font-bold text-[9px] py-2 uppercase tracking-widest transition-colors duration-300">
-                      + Add To Cart
-                    </button>
+                    
+                    <!-- 🎯 Buttons Grid Layout (পাশাপাশি সুন্দরভাবে অ্যাড করা হয়েছে) -->
+                    <div class="grid grid-cols-2 gap-1.5">
+                      <button data-id="${p._id}" data-name="${p.name}" data-price="${cur}" data-image="${productImg}" 
+                        class="add-btn w-full bg-slate-950 hover:bg-slate-800 text-white font-mono font-bold text-[9px] py-2 uppercase tracking-tight transition-colors duration-200 rounded-sm cursor-pointer">
+                        + Cart
+                      </button>
+                      <button data-id="${p._id}" data-name="${p.name}" data-price="${cur}" data-image="${productImg}" 
+                        class="order-now-btn w-full bg-orange-500 hover:bg-orange-600 text-white font-mono font-bold text-[9px] py-2 uppercase tracking-tight transition-colors duration-200 rounded-sm cursor-pointer">
+                        Order
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -153,7 +155,7 @@
           <!-- Load More Button -->
           ${hasMore ? `
             <div class="text-center mt-6 pt-4 border-t border-slate-50">
-              <button onclick="loadMore('${category.replace(/'/g, "\\'")}')" 
+              <button onclick="loadMore('${category.replace(/'/g, "\\'")}')"
                       class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 font-mono font-bold text-[9px] px-5 py-2 border border-slate-300 rounded shadow-sm transition-all active:scale-95 focus:outline-none tracking-widest uppercase">
                 + Load More
               </button>
@@ -166,31 +168,59 @@
     root.innerHTML = htmlContent;
   }
 
-  // কার্ট লজিক ইন্টিগ্রেশন (আপনার মেইন কোডের মতো)
+  // 🛒 Add to Cart & ⚡ Order Now ইভেন্ট ডেলিগেশন হ্যান্ডলার
   document.getElementById('categories-root').addEventListener('click', e => {
-    if (!e.target.classList.contains('add-btn')) return;
-    const b = e.target;
-    const prod = { id: b.dataset.id, name: b.dataset.name, price: parseFloat(b.dataset.price), image: b.dataset.image, quantity: 1 };
+    
+    // ১. Add to Cart বাটন চেক
+    const addBtn = e.target.closest('.add-btn');
+    if (addBtn) {
+      const prod = { 
+        id: addBtn.dataset.id, 
+        name: addBtn.dataset.name, 
+        price: parseFloat(addBtn.dataset.price), 
+        image: addBtn.dataset.image, 
+        quantity: 1 
+      };
 
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const exist = cart.find(i => i.id === prod.id);
-    exist ? exist.quantity++ : cart.push(prod);
-    localStorage.setItem('cart', JSON.stringify(cart));
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const exist = cart.find(i => i.id === prod.id);
+      exist ? exist.quantity++ : cart.push(prod);
+      localStorage.setItem('cart', JSON.stringify(cart));
 
-    window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { totalItems: cart.reduce((s, i) => s + i.quantity, 0) } }));
+      window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { totalItems: cart.reduce((s, i) => s + i.quantity, 0) } }));
 
-    Swal.fire({
-      title: 'Added to Cart',
-      text: prod.name,
-      icon: 'success',
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 1500,
-      background: '#0f172a',
-      color: '#fff',
-      iconColor: 'green'
-    });
+      Swal.fire({
+        title: 'Added to Cart',
+        text: prod.name,
+        icon: 'success',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 1500,
+        background: '#0f172a',
+        color: '#fff',
+        iconColor: 'green'
+      });
+      return;
+    }
+
+    // ২. ⚡ Order Now বাটন চেক
+    const orderBtn = e.target.closest('.order-now-btn');
+    if (orderBtn) {
+      const directItem = {
+        id: orderBtn.dataset.id,
+        name: orderBtn.dataset.name,
+        price: parseFloat(orderBtn.dataset.price),
+        image: orderBtn.dataset.image,
+        quantity: 1
+      };
+
+      // ডিরেক্ট অর্ডারের ডেটা লোকালস্টোরেজে পুশ
+      localStorage.setItem('direct_checkout_item', JSON.stringify(directItem));
+
+      // 🎯 ইউআরএল মার্কারসহ সরাসরি চেকআউট পেজে রিডাইরেক্ট
+      window.location.href = '/checkout?direct=true';
+    }
   });
 
   // DOM রেডি হলে রান হবে

@@ -259,6 +259,16 @@ router.get('/checkout', (req, res) => {
     }
 });
 
+
+
+
+
+
+
+
+
+
+
 // অর্ডার প্লেস করার API রাউট
 router.post('/api/orders/place', async (req, res) => {
     try {
@@ -294,7 +304,6 @@ const orderId = generateNumericOrderId();
            });
          await newOrder.save();
         
-        console.log('New Order Received:', { name, phone, email, address, items, totalAmount });
 
         // সাকসেস রেসপন্স
         res.status(200).json({ success: true, message: 'Order placed successfully!',orderId:orderId });
