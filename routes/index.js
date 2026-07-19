@@ -1,11 +1,18 @@
+
+
+
+
 var express = require('express');
 var router = express.Router();
 const Product = require('../models/Product'); // মডেলটি ইম্পোর্ট করলাম
 const Order = require('../models/Order'); // মড েলট ি ইম
+const numberToWords = require('number-to-words');
 
+const path = require('path');
+const fs = require('fs');
+const { PDFDocument, rgb } = require('pdf-lib');
 
-
-
+const fontkit = require('fontkit');
 
 /* GET home page. */
 
@@ -35,6 +42,7 @@ function isAdmin(req, res, next) {
     }
     // ন া থ াকল ে প াসওয় ার ্ড দ েওয় ার প েজ ে র িড াইর েক ্ট করব ে
     res.redirect('/admin-login');
+    
     
 }
 
@@ -494,6 +502,97 @@ router.post('/admin-login', (req, res) => {
 
 
 
+
+
+
+
+router.get('/admin/orders/download-memo/:id', async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+        if (!order) return res.status(404).send('Order not found');
+
+        const imagePath = path.join(__dirname, '../public/mirmemo.jpeg');
+        if (!fs.existsSync(imagePath)) return res.status(500).send('Memo base image not found');
+        const imageBytes = fs.readFileSync(imagePath);
+
+        const fontPath = path.join(__dirname, '../public/fonts/kalpurush.ttf');
+        if (!fs.existsSync(fontPath)) return res.status(500).send('Bangla font file not found');
+        const fontBytes = fs.readFileSync(fontPath);
+
+        const pdfDoc = await PDFDocument.create();
+        pdfDoc.registerFontkit(fontkit);
+        
+        const banglaFont = await pdfDoc.embedFont(fontBytes);
+        
+        const invoiceImage = await pdfDoc.embedJpg(imageBytes);
+        const page = pdfDoc.addPage([invoiceImage.width, invoiceImage.height]);
+        
+        page.drawImage(invoiceImage, { x: 0, y: 0, width: invoiceImage.width, height: invoiceImage.height });
+        
+        const H = invoiceImage.height;
+
+        page.drawText(`${order.orderId}`, { x: 160, y: H - 314, size: 24, font: banglaFont });
+        
+        const orderDate = new Date(order.createdAt).toLocaleDateString('en-GB');
+        page.drawText(`${orderDate}`, { x: 650, y: H - 314, size: 26, font: banglaFont });
+
+        page.drawText(`${order.name}`, { x: 260, y: H - 390, size: 30, font: banglaFont });
+        page.drawText(`${order.phone}`, { x: 630, y: H - 390, size: 30, font: banglaFont });
+        page.drawText(`${order.address}`, { x: 170, y: H - 430, size: 25, font: banglaFont });
+
+        let currentY = H - 533;
+        const rowHeight = 30.5;
+
+        order.items.forEach((item, index) => {
+            if (index < 10) {
+                const serialNo = (index + 1).toString();
+                
+                page.drawText(item.name, { x: 120, y: currentY, size: 26, font: banglaFont });
+                page.drawText(item.quantity.toString(), { x: 460, y: currentY, size: 26, font: banglaFont });
+                page.drawText(item.price.toString(), { x: 540, y: currentY, size: 26, font: banglaFont });
+                
+                const itemTotal = (item.price * item.quantity).toString();
+                page.drawText(itemTotal, { x: 700, y: currentY, size: 26, font: banglaFont });
+
+                currentY -= rowHeight;
+            }
+        });
+
+        page.drawText(`${order.totalAmount}`, { x: 640, y: H - 924, size: 26, font: banglaFont });
+        
+        const discount = order.discount || 0;
+        page.drawText(`${discount}`, { x: 640, y: H - 964, size: 26, font: banglaFont });
+        
+        const deliveryCharge = order.deliveryCharge || 0;
+        page.drawText(`${deliveryCharge}`, { x: 640, y: H - 1000, size: 26, font: banglaFont });
+        
+        
+        
+        
+        
+        page.drawText(`${order.totalAmount}`, { x: 640, y: H - 1040, size: 26, font: banglaFont, color: rgb(0.85, 0.2, 0) });
+
+
+// ১. সংখ্যাকে কথায় রূপান্তর করে প্রথম অক্ষর বড় হাতের (Capitalized) করা
+const amountInWords = numberToWords.toWords(order.totalAmount);
+const capitalizedWords = amountInWords.charAt(0).toUpperCase() + amountInWords.slice(1);
+const finalTotal = `${capitalizedWords}`;
+
+page.drawText(finalTotal, { x: 240, y: H - 1080, size: 26,
+ font: banglaFont, color: rgb(0.0, 0.4, 0.2)
+ });
+
+        const pdfBytes = await pdfDoc.save();
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=ShopMemo_${order.orderId}.pdf`);
+        res.send(Buffer.from(pdfBytes));
+        
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
 
 
 

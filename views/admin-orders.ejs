@@ -115,6 +115,17 @@ mb-5 block text-blue-600">Back to dashboard</a>
                   class="w-full text-xs font-bold py-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-all border border-red-200 hover:border-red-400">
                   <i class="fa-regular fa-trash-can mr-1"></i> Delete
                 </button>
+                
+                <button onclick="downloadMemo('<%= order._id %>')"
+        class="w-full text-xs font-bold py-1.5 
+        rounded-lg text-green-500 hover:bg-red-50 
+        transition-all border border-orange-200 
+        hover:border-orange-400"
+        >
+                
+                download memo <i class="fa-solid fa-download mr-1"></i>
+                </button>
+                
               </div>
 
             </div>
@@ -134,6 +145,13 @@ mb-5 block text-blue-600">Back to dashboard</a>
 <%- include('partials/footer') %>
 
 <script>
+
+function downloadMemo(id) {
+    // সরাসরি ব্যাকএন্ডের ডাইনামিক ডাউনলোড লিংকে পাঠিয়ে দিচ্ছি
+        window.location.href = `/admin/orders/download-memo/${id}`;
+        }
+
+
 document.addEventListener('DOMContentLoaded', () => {
   // Search
   const search = document.getElementById('order-search');
