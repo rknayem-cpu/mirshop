@@ -1,23 +1,22 @@
 <%- include('partials/header') %>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>                                                     
+<div class="min-h-[85vh] py-2 px-2">
+  <div class="max-w-6xl mx-auto bg-white p-2 md:p-8">
 
-<div class="min-h-[85vh] py-2  px-2">
-  <div class="max-w-6xl mx-auto
-   bg-white   p-2 md:p-8">
-    
     <a href="/all" class="text-xs text-slate-400 hover:text-orange-600 transition-colors inline-flex items-center gap-2 mb-6">
       <i class="fa-solid fa-arrow-left-long"></i> Back to Collection
     </a>
 
     <div class="grid md:grid-cols-2 gap-8">
-      
       <!-- Gallery -->
       <div>
         <div class="relative aspect-square bg-slate-100 rounded-xl overflow-hidden">
           <img id="main-product-image" src="<%= product.images?.[0] || '/placeholder.jpg' %>" alt="<%= product.name %>" class="w-full h-full object-cover">
           <div class="absolute top-3 left-3 flex flex-col gap-1">
             <% if (product.isNewArrival) { %>
-              <span class="bg-black text-white text-[10px] font-bold px-2 py-0.5 rounded">NEW</span>
+              <span class="bg-black text-white
+               text-[10px]  font-bold px-2 py-0.5
+                rounded">NEW</span>
             <% } %>
             <% if (product.isDiscount && product.price > product.discountPrice) { %>
               <span class="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">SAVE <%= Math.round(((product.price - product.discountPrice) / product.price) * 100) %>%</span>
@@ -39,7 +38,7 @@
       <div class="flex flex-col">
         <span class="text-[10px] text-orange-600 font-bold uppercase tracking-wider"><%= product.category %></span>
         <h1 class="text-2xl font-bold text-slate-900 mt-1"><%= product.name %></h1>
-        
+
         <div class="flex items-center gap-3 py-3 border-b border-slate-100">
           <% if (product.isDiscount && product.discountPrice) { %>
             <span class="text-2xl font-bold text-orange-600">৳<%= product.discountPrice %></span>
@@ -49,8 +48,7 @@
           <% } %>
         </div>
 
-        <p class="text-sm text-slate-600 
-        leading-relaxed my-4  whitespace-pre-line" style=""><%= product.bio || 'No description available.' %></p>
+        <p class="text-sm text-slate-600 leading-relaxed my-4 whitespace-pre-line"><%= product.bio || 'No description available.' %></p>
 
         <!-- Features -->
         <div class="grid grid-cols-2 gap-2 text-xs text-slate-600 mb-4">
@@ -60,36 +58,53 @@
           <div><i class="fa-regular fa-circle-check text-emerald-500 mr-1"></i> Secure</div>
         </div>
 
-        <!-- Add to Cart -->
-        <div class="mt-auto bg-slate-50 p-4 rounded-xl flex flex-wrap items-center gap-3">
-          <div class="flex border border-slate-200 rounded-lg bg-white">
-            <button id="qty-minus" class="px-3 py-2 text-slate-500 hover:bg-slate-50 rounded-l-lg">-</button>
-            <input id="qty-input" type="number" value="1" min="1" class="w-12 text-center text-sm font-bold border-none focus:outline-none [appearance:textfield]">
-            <button id="qty-plus" class="px-3 py-2 text-slate-500 hover:bg-slate-50 rounded-r-lg">+</button>
-          </div>
+        <!-- 🛒 Dynamic Cart & Order Panel Area -->
+        <div class="mt-auto bg-slate-50 p-4 rounded-xl flex flex-col gap-3">
           
-          <button id="add-to-cart-action" 
-            data-id="<%= product._id %>"
-            data-name="<%= product.name %>"
-            data-price="<%= (product.isDiscount && product.discountPrice) ? product.discountPrice : product.price %>"
-            data-image="<%= product.images?.[0] || '/placeholder.jpg' %>"
-            class="flex-1 bg-slate-900 hover:bg-orange-600 text-white text-sm font-bold py-2.5 px-4 rounded-lg transition-all flex items-center justify-center gap-2">
-            <i class="fa-solid fa-basket-shopping"></i> Add to Cart
-          </button>
+          <!-- Quantity Control Block -->
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-mono font-bold text-slate-500 uppercase">Quantity:</span>
+            <div class="flex border border-slate-200 rounded-lg bg-white">
+              <button id="qty-minus" class="px-3 py-1.5 text-slate-500 hover:bg-slate-50 rounded-l-lg font-bold">-</button>
+              <input id="qty-input" type="number" value="1" min="1" class="w-12 text-center text-sm font-bold border-none focus:outline-none [appearance:textfield]">
+              <button id="qty-plus" class="px-3 py-1.5 text-slate-500 hover:bg-slate-50 rounded-r-lg font-bold">+</button>
+            </div>
+          </div>
+
+          <!-- Action Buttons Wrapper (২-কলাম গ্রিড লেআউট) -->
+          <div class="grid grid-cols-2 gap-2.5 w-full">
+            <button id="add-to-cart-action"
+              data-id="<%= product._id %>"
+              data-name="<%= product.name %>"
+              data-price="<%= (product.isDiscount && product.discountPrice) ? product.discountPrice : product.price %>"
+              data-image="<%= product.images?.[0] || '/placeholder.jpg' %>"
+              class="bg-slate-950 hover:bg-slate-800 text-white text-xs font-bold py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-basket-shopping"></i> Add to Cart
+            </button>
+
+            <button id="order-now-action"
+              data-id="<%= product._id %>"
+              data-name="<%= product.name %>"
+              data-price="<%= (product.isDiscount && product.discountPrice) ? product.discountPrice : product.price %>"
+              data-image="<%= product.images?.[0] || '/placeholder.jpg' %>"
+              class="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-[0.99]">
+              <i class="fa-solid fa-bolt"></i> Order Now
+            </button>
+          </div>
+
         </div>
+
       </div>
     </div>
   </div>
 </div>
 
 <%- include('partials/recent') %>
-
-
 <%- include('partials/footer') %>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // Gallery
+  // Gallery Logic
   const mainImg = document.getElementById('main-product-image');
   document.querySelectorAll('.thumb-box').forEach((thumb, i, arr) => {
     thumb.onclick = () => {
@@ -99,35 +114,50 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   });
 
-  // Quantity
+  // Quantity Management Logic
   const qty = document.getElementById('qty-input');
   document.getElementById('qty-minus').onclick = () => { if(qty.value > 1) qty.value--; };
   document.getElementById('qty-plus').onclick = () => qty.value++;
 
-  // Add to Cart
+  // 1. Add to Cart Implementation
   document.getElementById('add-to-cart-action').onclick = function() {
     const q = parseInt(qty.value) || 1;
     const p = { id: this.dataset.id, name: this.dataset.name, price: parseFloat(this.dataset.price), image: this.dataset.image, quantity: q };
-    
+
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
     const exist = cart.find(item => item.id === p.id);
     exist ? exist.quantity += q : cart.push(p);
     localStorage.setItem('cart', JSON.stringify(cart));
-    
+
     const total = cart.reduce((s, i) => s + i.quantity, 0);
     window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { totalItems: total } }));
+
+    Swal.fire({ icon: 'success', title: 'Added to cart!', text: `${q}x ${p.name}`, toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, background: '#0f172a', color: 'white', iconColor: 'green' });
+  };
+
+  // 2. ⚡ Order Now Direct Engine Implementation
+  document.getElementById('order-now-action').onclick = function() {
+    const q = parseInt(qty.value) || 1;
     
-    Swal.fire({ icon: 'success', title: 'Added!', text: `${q}x ${p.name}`, toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, background: '#0f172a', color: '#fff', iconColor: '#ea580c' });
+    const directItem = { 
+      id: this.dataset.id, 
+      name: this.dataset.name, 
+      price: parseFloat(this.dataset.price), 
+      image: this.dataset.image, 
+      quantity: q // ইউজারের সিলেক্ট করা কোয়ান্টিটি পাস হচ্ছে
+    };
+
+    // লোকালস্টোরেজে ডিরেক্ট আইটেম অবজেক্ট পুশ
+    localStorage.setItem('direct_checkout_item', JSON.stringify(directItem));
+
+    // 🎯 ইউআরএল মার্কার ফ্ল্যাগসহ রিডাইরেক্ট ট্রিক
+    window.location.href = '/checkout?direct=true';
   };
 });
 </script>
 
-
-
-
-
 <script>
-  // ১. প্রোডাক্টের ডাটা ফ্রন্টএন্ডে নিয়ে নিলাম
+  // 👁️ Recent Views Engine Component
   const thisProduct = {
     id: "<%= product._id %>",
     name: `<%= product.name %>`,
@@ -135,14 +165,10 @@ document.addEventListener('DOMContentLoaded', () => {
     image: "<%= product.images && product.images[0] ? product.images[0] : '' %>"
   };
 
-  // ২. লোকালস্টোরেজ থেকে পুরোনো লিস্ট আনলাম, না থাকলে খালি অ্যারে নিলাম
   let list = JSON.parse(localStorage.getItem("recent_items")) || [];
-
-  // ৩. ডুপ্লিকেট ডিলিট করে নতুনটা সবার আগে (unshift) বসালাম
   list = list.filter(item => item.id !== thisProduct.id);
   list.unshift(thisProduct);
 
-  // ৪. ১০ টার বেশি হয়ে গেলে শেষেরটা বাদ দিয়ে আবার সেভ করলাম
   if (list.length > 10) list.pop();
   localStorage.setItem("recent_items", JSON.stringify(list));
 </script>
