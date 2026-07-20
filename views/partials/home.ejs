@@ -1,163 +1,199 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50/30 py-6 px-4 sm:px-6 font-sans antialiased">
+<div class="min-h-screen bg-slate-50/60 
+text-slate-900  antialiased py-6 px-4 sm:px-6">
   <div class="max-w-7xl mx-auto space-y-8">
-    
-    <!-- 🌟 Premium Header -->
-    <header class="bg-white/80 backdrop-blur-sm border border-slate-200/80 rounded-2xl p-5 shadow-lg shadow-slate-200/50 flex flex-col lg:flex-row items-center justify-between gap-4 transition-all hover:shadow-xl">
-      <div class="flex items-center gap-4 w-full lg:w-auto">
-        <!-- Animated Brand Logo -->
-        <div class="relative group">
-          <div class="w-12 h-12 bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-slate-900/20 group-hover:shadow-orange-500/30 transition-all duration-300 group-hover:scale-105">
-            M
-          </div>
-          <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-orange-500 rounded-full border-2 border-white animate-pulse"></div>
-        </div>
-        
-        <div>
-          <h1 class="text-lg sm:text-xl font-bold tracking-tight text-slate-900">
-            Mir Shop <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-orange-400">Premium</span>
-          </h1>
-          <p class="text-[10px] text-slate-400 font-mono uppercase tracking-widest flex items-center gap-2">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            secure checkout • authentic retail
-          </p>
-        </div>
+
+    <!-- 📚 Rokomari Style Category / Quick Bar (Using your exact routes) -->
+    <div class="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm">
+      <div class="flex items-center justify-between gap-4 overflow-x-auto no-scrollbar pb-1">
+        <a href="/category" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-orange-50 text-orange-600 font-bold text-xs shrink-0 hover:bg-orange-100 transition-colors">
+          <i class="fa-solid fa-bars-staggered"></i>
+          <span>সকল ক্যাটাগরি</span>
+        </a>
+        <a href="/all" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-medium text-xs shrink-0 transition-colors">
+          <i class="fa-solid fa-fire text-orange-500"></i>
+          <span>সকল পণ্য</span>
+        </a>
+        <a href="/all" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-medium text-xs shrink-0 transition-colors">
+          <i class="fa-solid fa-bolt text-amber-500"></i>
+          <span>নতুন আগমন</span>
+        </a>
+        <a href="/search" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-medium text-xs shrink-0 transition-colors">
+          <i class="fa-solid fa-percent text-emerald-500"></i>
+          <span>ডিসকাউন্ট অফার</span>
+        </a>
+        <a href="/search" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-medium text-xs shrink-0 transition-colors">
+          <i class="fa-solid fa-star text-blue-500"></i>
+          <span>সেরা বিক্রেতা</span>
+        </a>
+        <a href="/search" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-medium text-xs shrink-0 transition-colors">
+          <i class="fa-solid fa-magnifying-glass text-purple-500"></i>
+          <span>পণ্য খুঁজুন</span>
+        </a>
       </div>
-
-      <!-- Navigation -->
-      <nav class="flex items-center gap-2 bg-slate-100/80 p-1 rounded-xl border border-slate-200/50 w-full lg:w-auto">
-        <a href="/all" class="group text-[10px] font-mono font-bold uppercase tracking-wider px-4 py-2 rounded-lg text-slate-600 hover:text-slate-950 hover:bg-white transition-all duration-300 flex items-center gap-1.5">
-          <i class="fa-solid fa-boxes-stacked group-hover:scale-110 transition-transform"></i>
-          <span class="hidden sm:inline">All Goods</span>
-        </a>
-        <a href="/category" class="group text-[10px] font-mono font-bold uppercase tracking-wider px-4 py-2 rounded-lg text-slate-600 hover:text-slate-950 hover:bg-white transition-all duration-300 flex items-center gap-1.5">
-          <i class="fa-solid fa-layer-group group-hover:scale-110 transition-transform"></i>
-          <span class="hidden sm:inline">Categories</span>
-        </a>
-        <a href="/search" class="group bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white text-[10px] font-mono font-bold uppercase tracking-wider px-5 py-2 rounded-lg shadow-lg shadow-orange-500/25 transition-all duration-300 flex items-center gap-1.5 active:scale-95">
-          <i class="fa-solid fa-magnifying-glass group-hover:scale-110 transition-transform"></i>
-          <span>Search</span>
-        </a>
-      </nav>
-    </header>
-
-    <!-- ⚡ Hero Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      
-      <!-- Left Hero Panel -->
-      <section class="lg:col-span-7 bg-white/80 backdrop-blur-sm border border-slate-200/80 rounded-3xl p-8 shadow-lg shadow-slate-200/50 relative overflow-hidden hover:shadow-xl transition-all duration-500">
-        <!-- Decorative Elements -->
-        <div class="absolute -top-20 -right-20 w-64 h-64 bg-orange-200/20 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-emerald-200/20 rounded-full blur-3xl"></div>
-        <div class="absolute top-0 right-0 text-[120px] font-black text-slate-100/20 select-none pointer-events-none -mr-10 -mt-10">
-          MIR
-        </div>
-
-        <div class="relative z-10">
-          <div class="inline-flex items-center gap-2 text-[9px] font-mono font-bold uppercase tracking-widest text-orange-600 bg-orange-50 px-3 py-1.5 border border-orange-100 rounded-full mb-5">
-            <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
-            Verified Marketplace
-          </div>
-          
-          <h2 class="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
-            স্মার্ট সলিউশন ও চমৎকার
-            <br class="hidden sm:block">
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-orange-400">কাস্টমাইজড প্রডাক্ট</span> কালেকশন।
-          </h2>
-          
-          <p class="text-sm text-slate-500 mt-4 max-w-md leading-relaxed">
-            আমরা দিচ্ছি সেরা কোয়ালিটির নিশ্চয়তা ও দ্রুত ডেলিভারি প্যানেল। কোনো ঝামেলা ছাড়াই অর্ডার কমপ্লিট করুন।
-          </p>
-
-          <div class="flex flex-wrap gap-3 pt-6">
-            <a href="/all" class="group bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-mono font-bold text-[10px] px-6 py-3.5 rounded-xl shadow-lg shadow-orange-500/25 transition-all duration-300 flex items-center gap-2 active:scale-95">
-              Explore Catalog
-              <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
-            </a>
-            <a href="/search" class="group bg-white border border-slate-300 hover:border-orange-400 text-slate-700 font-mono font-bold text-[10px] px-6 py-3.5 rounded-xl transition-all duration-300 flex items-center gap-2 hover:shadow-md">
-              <i class="fa-solid fa-magnifying-glass"></i>
-              Quick Search
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <!-- Right Utility Grid -->
-      <aside class="lg:col-span-5 flex flex-col gap-4">
-        
-        <!-- Category Card -->
-        <div class="group bg-gradient-to-br from-slate-900 to-slate-800 p-5 rounded-2xl shadow-lg shadow-slate-900/20 flex items-center justify-between hover:shadow-orange-500/20 transition-all duration-500 hover:scale-[1.02]">
-          <div>
-            <div class="flex items-center gap-2">
-              <i class="fa-solid fa-th-large text-orange-400 text-sm"></i>
-              <h3 class="text-sm font-bold text-white uppercase tracking-wide">Dynamic Categories</h3>
-            </div>
-            <p class="text-[10px] font-mono text-slate-400 uppercase">// segment filter grid</p>
-          </div>
-          <a href="/category" class="w-10 h-10 bg-white/10 hover:bg-orange-500 rounded-xl flex items-center justify-center text-white transition-all duration-300 group-hover:rotate-12">
-            <i class="fa-solid fa-arrow-right text-xs"></i>
-          </a>
-        </div>
-
-        <!-- Search Card -->
-        <div class="group bg-white border border-slate-200/80 p-5 rounded-2xl shadow-sm flex items-center justify-between hover:shadow-lg hover:border-orange-200 transition-all duration-300">
-          <div>
-            <div class="flex items-center gap-2">
-              <i class="fa-solid fa-search text-orange-500 text-sm"></i>
-              <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide">Advanced Finder</h3>
-            </div>
-            <p class="text-[10px] font-mono text-slate-400 uppercase">// search filter engine</p>
-          </div>
-          <a href="/search" class="w-10 h-10 bg-slate-100 hover:bg-slate-900 rounded-xl flex items-center justify-center text-slate-600 hover:text-white transition-all duration-300 group-hover:rotate-12">
-            <i class="fa-solid fa-arrow-right text-xs"></i>
-          </a>
-        </div>
-
-
-<%- include('./pd') %>
-
-
-        <!-- Trust Card -->
-        <div class="bg-gradient-to-r from-emerald-50 to-emerald-100/50 border border-emerald-200/50 p-4 rounded-2xl flex items-center gap-4 hover:shadow-md transition-all duration-300">
-          <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-600/20 text-sm">
-            <i class="fa-solid fa-circle-check"></i>
-          </div>
-          <div>
-            <h4 class="text-xs font-bold text-emerald-950 uppercase tracking-wide flex items-center gap-2">
-              Fast Track Support
-              <span class="text-[8px] bg-emerald-200 text-emerald-700 px-1.5 py-0.5 rounded-full">24/7</span>
-            </h4>
-            <p class="text-[9px] text-emerald-700 font-medium">২৪ ঘণ্টার নির্ভরযোগ্য কাস্টমার কেয়ার ডেলিভারি সার্ভিস।</p>
-          </div>
-        </div>
-
-      </aside>
-
     </div>
 
-    <!-- 📊 Stats & Features -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div class="bg-white rounded-2xl p-5 text-center border border-slate-200/80 shadow-sm hover:shadow-lg hover:border-orange-200 transition-all duration-300 group">
-        <div class="text-2xl font-black text-orange-600
-         group-hover:scale-110 
-         transition-transform">1K+</div>
-        <div class="text-[10px] text-slate-500 mt-1">Happy Customers</div>
+    <!-- 📢 Notice / Announcement Strip -->
+    <div class="bg-gradient-to-r from-orange-600 to-amber-500 text-white rounded-2xl px-6 py-3.5 shadow-md flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-medium">
+      <div class="flex items-center gap-2.5">
+        <i class="fa-solid fa-bullhorn text-sm animate-bounce"></i>
+        <span>সারাদেশে যেকোনো অর্ডারে দ্রুততম হোম ডেলিভারি এবং ক্যাশ অন ডেলিভারি সুবিধা!</span>
       </div>
-      <div class="bg-white rounded-2xl p-5 text-center border border-slate-200/80 shadow-sm hover:shadow-lg hover:border-blue-200 transition-all duration-300 group">
-        <div class="text-2xl font-black text-blue-600 
-        group-hover:scale-110 transition-transform">100+</div>
-        <div class="text-[10px] text-slate-500 mt-1">Products</div>
+      <a href="/all" class="px-4 py-1.5 bg-white text-orange-600 font-bold rounded-lg shadow-sm hover:bg-slate-100 transition-colors shrink-0">
+        অর্ডার করুন
+      </a>
+    </div>
+
+    <!-- 🌟 Featured Navigation Grid (Using /all, /category, /search) -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <a href="/all" class="bg-white p-3.5 rounded-2xl border border-slate-200/80 text-center hover:border-orange-400 hover:shadow-md transition-all group">
+        <div class="w-10 h-10 mx-auto rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center text-base mb-2 group-hover:scale-110 transition-transform">
+          <i class="fa-solid fa-boxes-stacked"></i>
+        </div>
+        <h4 class="text-xs font-bold text-slate-800">সকল পণ্য</h4>
+        <p class="text-[10px] text-slate-400 mt-0.5">সব কালেকশন</p>
+      </a>
+
+      <a href="/category" class="bg-white p-3.5 rounded-2xl border border-slate-200/80 text-center hover:border-orange-400 hover:shadow-md transition-all group">
+        <div class="w-10 h-10 mx-auto rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base mb-2 group-hover:scale-110 transition-transform">
+          <i class="fa-solid fa-layer-group"></i>
+        </div>
+        <h4 class="text-xs font-bold text-slate-800">ক্যাটাগরি</h4>
+        <p class="text-[10px] text-slate-400 mt-0.5">মেনু লিস্ট</p>
+      </a>
+
+      <a href="/search" class="bg-white p-3.5 rounded-2xl border border-slate-200/80 text-center hover:border-orange-400 hover:shadow-md transition-all group">
+        <div class="w-10 h-10 mx-auto rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-base mb-2 group-hover:scale-110 transition-transform">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+        <h4 class="text-xs font-bold text-slate-800">সার্চ করুন</h4>
+        <p class="text-[10px] text-slate-400 mt-0.5">পণ্য খুঁজুন</p>
+      </a>
+
+      <a href="/all" class="bg-white p-3.5 rounded-2xl border border-slate-200/80 text-center hover:border-orange-400 hover:shadow-md transition-all group">
+        <div class="w-10 h-10 mx-auto rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-base mb-2 group-hover:scale-110 transition-transform">
+          <i class="fa-solid fa-fire"></i>
+        </div>
+        <h4 class="text-xs font-bold text-slate-800">জনপ্রিয়</h4>
+        <p class="text-[10px] text-slate-400 mt-0.5">সেরা আইটেম</p>
+      </a>
+
+      <a href="/category" class="bg-white p-3.5 rounded-2xl border border-slate-200/80 text-center hover:border-orange-400 hover:shadow-md transition-all group">
+        <div class="w-10 h-10 mx-auto rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-base mb-2 group-hover:scale-110 transition-transform">
+          <i class="fa-solid fa-tags"></i>
+        </div>
+        <h4 class="text-xs font-bold text-slate-800">অফার সমূহ</h4>
+        <p class="text-[10px] text-slate-400 mt-0.5">বিশেষ ছাড়</p>
+      </a>
+
+      <a href="/search" class="bg-white p-3.5 rounded-2xl border border-slate-200/80 text-center hover:border-orange-400 hover:shadow-md transition-all group">
+        <div class="w-10 h-10 mx-auto rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-base mb-2 group-hover:scale-110 transition-transform">
+          <i class="fa-solid fa-bolt"></i>
+        </div>
+        <h4 class="text-xs font-bold text-slate-800">তাৎক্ষণিক</h4>
+        <p class="text-[10px] text-slate-400 mt-0.5">দ্রুত ব্রাউজ</p>
+      </a>
+    </div>
+
+    <!-- Main Dynamic Products Section (Rokomari Style Grid) -->
+    <main class="space-y-1">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-1.5 h-5 bg-orange-600 rounded-full"></div>
+          <h2 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">জনপ্রিয় কালেকশন</h2>
+        </div>
+        <a href="/all" class="text-xs font-bold text-orange-600 hover:text-orange-700 flex items-center gap-1">
+          <span>সব দেখুন</span>
+          <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        </a>
       </div>
-      <div class="bg-white rounded-2xl p-5 text-center border border-slate-200/80 shadow-sm hover:shadow-lg hover:border-emerald-200 transition-all duration-300 group">
-        <div class="text-2xl font-black 
-        text-emerald-600 group-hover:scale-110
-         transition-transform">75%</div>
-        <div class="text-[10px] text-slate-500 mt-1">Satisfaction</div>
+
+      <!-- Products Render -->
+      <div class="pt-2 -mb-10">
+        <%- include('./pd') %>
       </div>
-      <div class="bg-white rounded-2xl p-5 text-center border border-slate-200/80 shadow-sm hover:shadow-lg hover:border-purple-200 transition-all duration-300 group">
-        <div class="text-2xl font-black
-         text-purple-600 group-hover:scale-110
-          transition-transform">24/7</div>
-        <div class="text-[10px] text-slate-500 mt-1">Support</div>
+    </main>
+
+    <!-- 💡 Additional Info & Text Section -->
+    <section class="bg-white 
+    border border-slate-200/80 rounded-2xl
+     p-6 sm:p-8 shadow-sm space-y-0">
+      <div class="border-b border-slate-100 pb-4">
+        <h3 class="text-base font-bold text-slate-900">অনলাইন শপিংয়ে একটি নির্ভরযোগ্য মাধ্যম</h3>
+        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+          আমাদের প্ল্যাটফর্মে আপনি পাবেন ಅತ್ಯಂತ নিখুঁত ও প্রিমিয়াম কোয়ালিটির প্রডাক্ট। গ্রাহকদের সন্তুষ্টিই আমাদের প্রধান লক্ষ্য। ঘরে বসেই আপনার প্রয়োজনীয় জিনিস অর্ডার করুন এবং নিরাপদে হাতে পান।
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-600">
+        <div class="space-y-2">
+          <h4 class="font-bold text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-circle-check text-orange-600"></i> সহজ অর্ডার প্রসেস
+          </h4>
+          <p class="text-slate-500 leading-relaxed">
+            ক্লিক করেই সহজেই আপনার পছন্দমতো পণ্য কার্ট করুন এবং ঝঞ্ঝাটহীনভাবে চেকআউট সম্পন্ন করুন।
+          </p>
+        </div>
+
+        <div class="space-y-2">
+          <h4 class="font-bold text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-circle-check text-orange-600"></i> দ্রুত হোম ডেলিভারি
+          </h4>
+          <p class="text-slate-500 leading-relaxed">
+            দেশের যেকোনো প্রান্তে নিরাপদে ও নির্ধারিত সময়ের মধ্যে আপনার পার্সেল পৌঁছে দেওয়া হয়।
+          </p>
+        </div>
+
+        <div class="space-y-2">
+          <h4 class="font-bold text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-circle-check text-orange-600"></i> ২৪/৭ কাস্টমার সাপোর্ট
+          </h4>
+          <p class="text-slate-500 leading-relaxed">
+            যেকোনো প্রয়োজনে আমাদের সাপোর্ট টিম সবসময় প্রস্তুত রয়েছে আপনাকে দ্রুত সহায়তা করতে।
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 🛡️ Feature Badges at Bottom -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-4 flex items-center gap-3 shadow-sm">
+        <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center text-base shrink-0">
+          <i class="fa-solid fa-truck-fast"></i>
+        </div>
+        <div>
+          <h4 class="font-bold text-slate-900 text-xs">দ্রুত ডেলিভারি</h4>
+          <p class="text-[10px] text-slate-400">নিরাপদ ও দ্রুত প্রেরণ</p>
+        </div>
+      </div>
+
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-4 flex items-center gap-3 shadow-sm">
+        <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center text-base shrink-0">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div>
+          <h4 class="font-bold text-slate-900 text-xs">১০০% আসল পণ্য</h4>
+          <p class="text-[10px] text-slate-400">সেরা কোয়ালিটি গ্যারান্টি</p>
+        </div>
+      </div>
+
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-4 flex items-center gap-3 shadow-sm">
+        <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center text-base shrink-0">
+          <i class="fa-solid fa-headset"></i>
+        </div>
+        <div>
+          <h4 class="font-bold text-slate-900 text-xs">২৪/৭ কাস্টমার কেয়ার</h4>
+          <p class="text-[10px] text-slate-400">যেকোনো প্রয়োজনে সহায়তা</p>
+        </div>
+      </div>
+
+      <div class="bg-white border border-slate-200/80 rounded-2xl p-4 flex items-center gap-3 shadow-sm">
+        <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center text-base shrink-0">
+          <i class="fa-solid fa-rotate-left"></i>
+        </div>
+        <div>
+          <h4 class="font-bold text-slate-900 text-xs">সহজ রিটার্ন পলিসি</h4>
+          <p class="text-[10px] text-slate-400">ঝামেলাহীন পরিবর্তন</p>
+        </div>
       </div>
     </div>
 
